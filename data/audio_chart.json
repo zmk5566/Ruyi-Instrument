@@ -1,0 +1,119 @@
+[
+  {
+    "condition_name": 45,
+    "condition_info": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "low_wind_condition": 45
+  },
+  {
+    "condition_name": 43,
+    "condition_info": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "low_wind_condition": 43
+  },
+  {
+    "condition_name": 41,
+    "condition_info": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "low_wind_condition": 41
+  },
+  {
+    "condition_name": 40,
+    "condition_info": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    "low_wind_condition": 40
+  },
+  {
+    "condition_name": 38,
+    "condition_info": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "low_wind_condition": 38
+  },
+  {
+    "condition_name": 36,
+    "condition_info": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    "low_wind_condition": 36
+  },
+  {
+    "condition_name": 35,
+    "condition_info": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "low_wind_condition": 35
+  },
+  {
+    "condition_name": 33,
+    "condition_info": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "low_wind_condition": 33
+  },
+  {
+    "condition_name": 31,
+    "condition_info": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "low_wind_condition": 28
+  }
+]
