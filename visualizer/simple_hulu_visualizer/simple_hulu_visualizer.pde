@@ -4,6 +4,12 @@
  * oscP5 website at http://www.sojamo.de/oscP5
  */
  
+ 
+import processing.sound.*;
+
+SinOsc sine;
+ 
+ 
 import oscP5.*;
 import netP5.*;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
@@ -37,6 +43,11 @@ void setup() {
    * send messages back to this sketch.
    */
   myRemoteLocation = new NetAddress("127.0.0.1",12000);
+  
+    // create and start the sine oscillator.
+  sine = new SinOsc(this);
+  sine.play();
+  sinewave_update();
 }
 
 
@@ -44,6 +55,7 @@ void draw() {
   background(122);  
   display_sensors();
   display_others();
+  sinewave_update();
 }
 
 void mousePressed() {
@@ -94,7 +106,7 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
 void display_sensors(){
   
   for (int i = 0; i < sensor_value.length-2;i++){
-    fill(255);
+    fill(255+122*sensor_value[i]);
     ellipse(50+sensor_value[i]/5,50+50*(sensor_value.length-2-i),20,20); 
     fill(0);
     text(i,50+sensor_value[i]/5,50+50*(sensor_value.length-2-i));
@@ -131,4 +143,20 @@ int findConditionName(int[] conditions,JSONArray jsonArr) {
   }
   
   return -1; // Return -1 or any other value to indicate that no match was found
+}
+
+
+void sinewave_update(){
+  
+  float amplitude = map(sensor_value[7], 0, 255, 0, 1);
+  sine.amp(amplitude);
+
+  // Map mouseX from 20Hz to 1000Hz for frequency  
+  float frequency =midiNoteToFrequency(findConditionName(sensor_value,json));
+  sine.freq(frequency);
+}
+
+
+float midiNoteToFrequency(int midiNote) {
+  return pow(2, (midiNote - 69+36) / 12.0) * 440;
 }
