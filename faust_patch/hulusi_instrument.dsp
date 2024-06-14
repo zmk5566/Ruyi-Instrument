@@ -1,10 +1,10 @@
-declare name "blowBottle";
-declare description "Blown Bottle Instrument";
-declare author "Romain Michon (rmichon@ccrma.stanford.edu)";
-declare copyright "Romain Michon";
+declare name "Hulusi";
+declare description "Hulusi Instrument";
+declare author "Zhengyang Kenny Ma (zmaaf@connect.ust.hk)";
+declare copyright "Zhengyang Kenny Ma";
 declare version "1.0";
 declare licence "STK-4.3"; // Synthesis Tool Kit 4.3 (MIT style license);
-declare description "This object implements a helmholtz resonator (biquad filter) with a polynomial jet excitation (a la Cook).";
+declare description "based on Romain Michon example of the bottle. customized as a hulusi with a blowing pressure";
 
 import("instruments.lib");
 

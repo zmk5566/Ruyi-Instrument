@@ -1,13 +1,4 @@
-/**
- * oscP5sendreceive by andreas schlegel
- * example shows how to send and receive osc messages.
- * oscP5 website at http://www.sojamo.de/oscP5
- */
- 
- 
-import processing.sound.*;
-
-SinOsc sine;
+//SinOsc sine;
  
  
 import oscP5.*;
@@ -44,10 +35,8 @@ void setup() {
    */
   myRemoteLocation = new NetAddress("127.0.0.1",12000);
   
-    // create and start the sine oscillator.
-  sine = new SinOsc(this);
-  sine.play();
-  sinewave_update();
+
+  //sinewave_update();
 }
 
 
@@ -55,7 +44,6 @@ void draw() {
   background(122);  
   display_sensors();
   display_others();
-  sinewave_update();
 }
 
 void mousePressed() {
@@ -70,6 +58,19 @@ void mousePressed() {
   println("message sent");
   /* send the message */
   oscP5.send(myMessage, myRemoteLocation); 
+}
+
+
+void updatePitch(int pitch_value, int breath){
+  OscMessage myMessage = new OscMessage("/Hulusi/Basic_Parameters/midiPitch");
+  myMessage.add(pitch_value);
+
+  /* send the message */
+  oscP5.send(myMessage, myRemoteLocation); 
+  OscMessage myMessage3 = new OscMessage("/Hulusi/Physical_and_Nonlinearity/Physical_Parameters/Pressure");
+
+  myMessage3.add(map(breath,0,255,0.7,1.0));
+  oscP5.send(myMessage3, myRemoteLocation); 
 }
 
 
@@ -145,16 +146,6 @@ int findConditionName(int[] conditions,JSONArray jsonArr) {
   return -1; // Return -1 or any other value to indicate that no match was found
 }
 
-
-void sinewave_update(){
-  
-  float amplitude = map(sensor_value[7], 0, 255, 0, 1);
-  sine.amp(amplitude);
-
-  // Map mouseX from 20Hz to 1000Hz for frequency  
-  float frequency =midiNoteToFrequency(findConditionName(sensor_value,json));
-  sine.freq(frequency);
-}
 
 
 float midiNoteToFrequency(int midiNote) {
