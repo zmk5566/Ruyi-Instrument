@@ -44,16 +44,18 @@ void setup() {
 
 
 void draw() {
-  background(122);  
+  background(122); 
+  textSize(12); // 
   display_sensors();
   display_others();
+  displayScale();
    
   
   
 }
 
 void displayScale(){
-  
+  textSize(120); // 
   String temp = getCurrentName(pitchShift);
   text(temp,300,300);
 }
@@ -149,7 +151,7 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
     // do the actually send logic
 
     
-    updatePitch(findConditionName(sensor_value,json),sensor_value[7]);
+    updatePitch(findConditionName(sensor_value,json)+pitchShift,sensor_value[7]);
     
     updateGate(255);
     
@@ -219,11 +221,22 @@ int findConditionName(int[] conditions,JSONArray jsonArr) {
 
 String getCurrentName(int number){
   int index = Math.floorMod(number, pitchNames.length); 
-  return pitchNames[index];
+  int scalenumber = 3+int(number/12);
+  return pitchNames[index]+scalenumber;
 }
 
 
 
 float midiNoteToFrequency(int midiNote) {
   return pow(2, (midiNote - 69+36) / 12.0) * 440;
+}
+
+void keyPressed() {
+  if (pitchShift <= 13 && pitchShift >= -13){
+  if (keyCode == UP) { // 如果按下的是上箭头键
+    pitchShift++; // 增加pitch shift的值
+  } else if (keyCode == DOWN) { // 如果按下的是下箭头键
+    pitchShift--; // 减少pitch shift的值
+  }
+  }
 }
