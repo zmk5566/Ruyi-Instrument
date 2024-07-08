@@ -5,11 +5,11 @@ import oscP5.*;
 import netP5.*;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
+String[] pitchNames = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
+int pitchShift = 0;
 
 // start defining the situation
 
-
-  
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
@@ -47,6 +47,15 @@ void draw() {
   background(122);  
   display_sensors();
   display_others();
+   
+  
+  
+}
+
+void displayScale(){
+  
+  String temp = getCurrentName(pitchShift);
+  text(temp,300,300);
 }
 
 void mousePressed() {
@@ -206,6 +215,11 @@ int findConditionName(int[] conditions,JSONArray jsonArr) {
   }
   
   return -1; // Return -1 or any other value to indicate that no match was found
+}
+
+String getCurrentName(int number){
+  int index = Math.floorMod(number, pitchNames.length); 
+  return pitchNames[index];
 }
 
 
