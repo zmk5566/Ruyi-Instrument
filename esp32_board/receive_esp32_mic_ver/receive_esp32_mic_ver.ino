@@ -1,3 +1,6 @@
+#include <driver/i2s.h>
+
+
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #else
@@ -6,7 +9,6 @@
 #include <WiFiUdp.h>
 #include <OSCMessage.h>
 
-#include <driver/i2s.h>
  
 // Connections to INMP441 I2S microphone
 #define I2S_WS 25
@@ -119,10 +121,7 @@ void update_vol(){
   // False print statements to "lock range" on serial plotter display
   // Change rangelimit value to adjust "sensitivity"
   int rangelimit = 2;
-  Serial.print(0);
-  Serial.print(" ");
-  Serial.print(rangelimit);
-  Serial.print(" ");
+
 
   // Get I2S data and place in data buffer
   size_t bytesIn = 0;
@@ -180,10 +179,10 @@ void sendmessage(String str) {
   // After the loop, there's still one last number (or the only number if no spaces were found) to convert and print
   if (fromIndex < str.length()) {
     String lastNumberStr = str.substring(fromIndex);
-
-    msg.add(int(current_vol*100));
+    msg.add(lastNumberStr.toInt());
     //Serial.println(lastNumberStr.toInt());
   }
+    msg.add(current_vol);
 
     Udp.beginPacket(outIp, outPort);
     msg.send(Udp);
