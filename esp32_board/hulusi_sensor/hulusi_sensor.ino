@@ -83,10 +83,13 @@ void loop() {
 
 void array_printing(){
   for(int i = 0; i < 8; i++) {
+    Serial.print(myArray[i]);
+    Serial.print(" "); // Print a space after each number
     Serial2.print(myArray[i]);
     Serial2.print(" "); // Print a space after each number
   }
   // Change the line after the last element has been printed
+  Serial.println(); // This moves the cursor to the next line
   Serial2.println(); // This moves the cursor to the next line
 }
 
@@ -140,5 +143,5 @@ void main_loop(){
 
 int sensor_mapping(int input_pin){
 
-  return constrain(map(touchRead(input_pin),45,10,0,255),0,255);
+  return constrain(map(touchRead(input_pin),18,10,0,255),0,255);
 }
