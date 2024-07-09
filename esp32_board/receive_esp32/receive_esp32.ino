@@ -10,7 +10,7 @@ char ssid[] = "SoundLab";          // your network SSID (name)
 char pass[] = "kkkk8888";                    // your network password
 
 WiFiUDP Udp;                                // A UDP instance to let us send and receive packets over UDP
-const IPAddress outIp(192,168,1,2);        // remote IP of your computer
+const IPAddress outIp(192,168,1,200);        // remote IP of your computer
 const unsigned int outPort = 12000;          // remote port to receive OSC
 const unsigned int localPort = 8888;        // local port to listen for OSC packets (actually not used for sending)
 
@@ -91,5 +91,3 @@ void sendmessage(String str) {
 
 
 }
-
-

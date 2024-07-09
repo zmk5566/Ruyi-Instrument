@@ -15,7 +15,7 @@
 int16_t sBuffer[bufferLen];
 
 int myArray[] = {0,0,0,0,0,0,0,0};
-int myPins[] = {27, 14, 12, 13, 4, 33, 15};
+int myPins[] = {27, 14, 12, 13, 4, 32, 15};
 
 unsigned long previousMillis = 0;        // stores last time LED was updated
 const long interval = 20;              // interval at which to blink (milliseconds)
