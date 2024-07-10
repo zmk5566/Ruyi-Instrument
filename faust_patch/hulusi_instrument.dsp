@@ -7,12 +7,14 @@ declare licence "STK-4.3"; // Synthesis Tool Kit 4.3 (MIT style license);
 declare description "based on Romain Michon example of the bottle. customized as a hulusi with a blowing pressure";
 
 import("instruments.lib");
+import("stdfaust.lib");
+fl = library("filter.lib");
 
 //==================== GUI SPECIFICATION ================
 
 // Replaced freq with midiPitch and added frequency calculation
 midiPitch = hslider("h:Basic_Parameters/midiPitch [1][tooltip:MIDI pitch value]", 69, 50, 75, 1); 
-freq = 440 * pow(2, (midiPitch - 69) / 12); // Calculate frequency from MIDI pitch
+tfreq = 440 * pow(2, (midiPitch - 69) / 12); // Calculate frequency from MIDI pitch
 
 gain = nentry("h:Basic_Parameters/gain [1][tooltip:Gain (value between 0 and 1)]",1,0,1,0.01); 
 gate = button("h:Basic_Parameters/gate [1][tooltip:noteOn = 1, noteOff = 0]");
@@ -21,6 +23,14 @@ noiseGain = hslider("h:Physical_and_Nonlinearity/v:Physical_Parameters/Noise_Gai
 [2][tooltip:Breath noise gain (value between 0 and 1)]",0.5,0,1,0.01)*2;
 pressure = hslider("h:Physical_and_Nonlinearity/v:Physical_Parameters/Pressure 
 [2][tooltip:Breath pressure (value bewteen 0 and 1)]",1,0.7,1,0.01);
+
+
+portamento = vslider("[5] Portamento [unit:sec] [style:knob] [scale:log]
+      [tooltip: Portamento (frequency-glide) time-constant in seconds]",
+      0.1,0.001,10,0.001);
+ freq = tfreq : fl.smooth(fl.tau2pole(portamento));
+
+
 
 typeModulation = 0;
 nonLinearity =0;
