@@ -13,7 +13,7 @@ fl = library("filter.lib");
 //==================== GUI SPECIFICATION ================
 
 // Replaced freq with midiPitch and added frequency calculation
-midiPitch = hslider("h:Basic_Parameters/midiPitch [1][tooltip:MIDI pitch value]", 69, 50, 75, 1); 
+midiPitch = hslider("h:Basic_Parameters/midiPitch [1][tooltip:MIDI pitch value]", 69, 20, 75, 1); 
 tfreq = 440 * pow(2, (midiPitch - 69) / 12); // Calculate frequency from MIDI pitch
 
 gain = nentry("h:Basic_Parameters/gain [1][tooltip:Gain (value between 0 and 1)]",1,0,1,0.01); 
