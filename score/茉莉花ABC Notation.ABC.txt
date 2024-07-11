@@ -9,7 +9,7 @@ E/z/E/G/A/c/c/A/|G/z/G/A/G/z/z|
 G/z/G/z/G/z/E/G/|A/z/A/z/G/z/z|
 E/z/D/E/G/A/E/D/|C/z/C/D/C/z/C/z/|
 E/D/C/E/D3/2E/|GA/c/G2|
-DE/G/E/D/C/A,/|z4|
+DE/G/D/E/C/A,/|z4|
 d3/2c/c/d/c/A/|G3z|
 EE/G/A/c/c/A/|GG/A/G2|
 EE/G/A/c/c/A/|GG/A/G2|
@@ -29,14 +29,14 @@ E/z/C/E/E/z/C/E/|G/z/E/z/C/z/z|
 E/z/C/E/E/z/C/E/|C/z/E/z/G/z/z|
 D/z/E/z/D/z/C/E/|E/z/E/z/G/z/z|
 C/z/D/E/CA,/G,/|C/z/C/B,/C/A,/G,/E,/|
-z2D/D/D/E/|z2G/A/G/E|
-DE/G/E/D/C/A,/|G,2A,C|
+z2D/D/D/E/|z2G/A/G/E/|
+DE/G/D/E/C/A,/|G,2A,C|
 D3/2C/C/D/C/A,/|G,A,CD|
-E3/2G/A,3/2C|D3/2E/G/A/G/E/|
+E3/2G/A,3/2C/|D3/2E/G/A/G/E/|
 CC/D/A,/C/C/A,/|D3/2E/A,/C/D/E/|
 EEEC/E/|EED/E/G/A/|
 C3/2B,/E3/2D/|CC/D/C/A,/G,/E,/|
-C/A,/A,/C/A,3/2C/|ED/C/E,/G,/A,/C|
+C/A,/A,/C/A,3/2C/|ED/C/E,/G,/A,/C/|
 DE/G/D/E/C/A,/|G,2A,C|
 D3/2E/C/D/C/A,/|G,4|
 
