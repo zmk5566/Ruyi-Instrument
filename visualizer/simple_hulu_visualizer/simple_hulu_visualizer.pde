@@ -49,7 +49,7 @@ void draw() {
   display_sensors();
   display_others();
   displayScale();
-   
+  display_meter();
   
   
 }
@@ -190,14 +190,21 @@ void display_sensors(){
 
 
 void display_others(){
-  fill(50+sensor_value[6]/5,50,50);
+  fill(100-sensor_value[6]*50);
   ellipse(50,50,20,20);
   fill(255);
   text("b",50,50);
   
 }
 
-
+void display_meter(){
+  fill(200);
+  rect(100,40,255,20);
+  fill(150);
+  rect(100,40,sensor_value[7],20);
+  
+  
+}
 int findConditionName(int[] conditions,JSONArray jsonArr) {
   for (int i = 0; i < jsonArr.size(); i++) {
     JSONObject jsonObj = jsonArr.getJSONObject(i);
