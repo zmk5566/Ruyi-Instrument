@@ -15,10 +15,13 @@
 int16_t sBuffer[bufferLen];
 
 int myArray[] = {0,0,0,0,0,0,0,0};
+int pastArray[] = {0,0,0,0,0,0,0,0};
+
 int myPins[] = {27, 14, 12, 13, 4, 32, 15};
+bool isChanging = false;
 
 unsigned long previousMillis = 0;        // stores last time LED was updated
-const long interval = 20;              // interval at which to blink (milliseconds)
+const long interval = 50;              // interval at which to blink (milliseconds)
  
 void i2s_install() {
   // Set up I2S Processor configuration
@@ -69,6 +72,7 @@ void loop() {
   unsigned long currentMillis = millis();
   
   main_loop();
+  compareArraysAndTrigger();
 
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;   // save the last time you blinked the LED
@@ -144,4 +148,27 @@ void main_loop(){
 int sensor_mapping(int input_pin){
 
   return constrain(map(touchRead(input_pin),18,10,0,255),0,255);
+}
+
+
+void compareArraysAndTrigger() {
+  bool shouldPrint = false; // Flag to determine if array_printing should be called
+
+  for(int i = 0; i < 8; i++) {
+    // Check if the current state is different from the past state
+    // AND either current or past was 0, indicating an ON/OFF or OFF/ON transition
+    if((myArray[i] != pastArray[i]) && (myArray[i] == 0 || pastArray[i] == 0)) {
+      shouldPrint = true; // Set the flag to true if any change detected
+      break; // No need to check further if we already found a change
+    }
+  }
+
+  if(shouldPrint) {
+    array_printing(); // Call the printing function if there was a change
+  }
+
+  // Update pastArray with the contents of myArray for the next comparison
+  for(int i = 0; i < 8; i++) {
+    pastArray[i] = myArray[i];
+  }
 }
