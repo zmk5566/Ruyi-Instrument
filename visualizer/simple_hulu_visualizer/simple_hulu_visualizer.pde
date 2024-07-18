@@ -118,7 +118,7 @@ void oscEvent(OscMessage theOscMessage) {
 
   try{
   update_the_sensor(sensor_value,theOscMessage);
-    println(sensor_value);
+    //println(sensor_value);
 
   } catch(Exception e){
     println("something wrong");
@@ -150,9 +150,15 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
     }
     // do the actually send logic
 
-    
-    updatePitch(findConditionName(sensor_value,json)+pitchShift,sensor_value[7]);
-    
+    int[] temp_condition = findConditionName(sensor_value,json);
+    int temp_n = temp_condition[0];
+    int temp_low = temp_condition[1];
+    println(temp_low);
+    if (sensor_value[7]>195){
+            updatePitch(temp_n+pitchShift+36,sensor_value[7]);
+    }else{
+              updatePitch(temp_low+pitchShift+36,sensor_value[7]);
+    }
     updateGate(255);
     
   
@@ -205,7 +211,8 @@ void display_meter(){
   
   
 }
-int findConditionName(int[] conditions,JSONArray jsonArr) {
+int[] findConditionName(int[] conditions,JSONArray jsonArr) {
+  int [] temp = {-1,-1};
   for (int i = 0; i < jsonArr.size(); i++) {
     JSONObject jsonObj = jsonArr.getJSONObject(i);
     JSONArray conditionInfo = jsonObj.getJSONArray("condition_info");
@@ -219,11 +226,15 @@ int findConditionName(int[] conditions,JSONArray jsonArr) {
     }
     
     if (match) {
-      return jsonObj.getInt("condition_name");
+      temp[0] = jsonObj.getInt("condition_name");
+      temp[1]=  jsonObj.getInt("low_wind_condition");
+      
+      //return {jsonObj.getInt("condition_name"),jsonObj.getInt("low_wind_condition")]};
+      return temp;
     }
   }
   
-  return -1; // Return -1 or any other value to indicate that no match was found
+  return temp; // Return -1 or any other value to indicate that no match was found
 }
 
 String getCurrentName(int number){
@@ -234,9 +245,6 @@ String getCurrentName(int number){
 
 
 
-float midiNoteToFrequency(int midiNote) {
-  return pow(2, (midiNote - 69+36) / 12.0) * 440;
-}
 
 void keyPressed() {
   if (pitchShift <= 13 && pitchShift >= -13){

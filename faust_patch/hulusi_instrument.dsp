@@ -13,7 +13,7 @@ fl = library("filter.lib");
 //==================== GUI SPECIFICATION ================
 
 // Replaced freq with midiPitch and added frequency calculation
-midiPitch = hslider("h:Basic_Parameters/midiPitch [1][tooltip:MIDI pitch value]", 69, 20, 75, 1); 
+midiPitch = hslider("h:Basic_Parameters/midiPitch [1][tooltip:MIDI pitch value]", 69, 20, 255, 1); 
 tfreq = 440 * pow(2, (midiPitch - 69) / 12); // Calculate frequency from MIDI pitch
 
 gain = nentry("h:Basic_Parameters/gain [1][tooltip:Gain (value between 0 and 1)]",1,0,1,0.01); 
@@ -41,7 +41,7 @@ envelopeAttack = hslider("h:Envelopes_and_Vibrato/v:Envelope_Parameters/Envelope
 [5][unit:s][tooltip:Envelope attack duration]",0.01,0,2,0.01);
 envelopeDecay = hslider("h:Envelopes_and_Vibrato/v:Envelope_Parameters/Envelope_Decay 
 [5][unit:s][tooltip:Envelope decay duration]",0.01,0,2,0.01);
-envelopeRelease = 0.07;
+envelopeRelease = 0.02;
 
 
 //==================== SIGNAL PROCESSING ================
@@ -77,7 +77,7 @@ bandPassFilter = bandPass(freq,huluRadius);
 envelopeG =  gain*en.adsr(gain*envelopeAttack,envelopeDecay,1,envelopeRelease,gate);
 
 //pressure envelope is also ADSR
-envelope = pressure*en.adsr(gain*0.02,0.01,1,gain*0.2,gate);
+envelope = pressure*en.adsr(gain*0.02,0.01,1,0.02,gate);
 
 //breat pressure
 breathPressure = envelope;
