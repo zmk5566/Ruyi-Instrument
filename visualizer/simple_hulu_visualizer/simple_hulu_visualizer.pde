@@ -118,7 +118,7 @@ void oscEvent(OscMessage theOscMessage) {
 
   try{
   update_the_sensor(sensor_value,theOscMessage);
-    //println(sensor_value);
+    println(sensor_value);
 
   } catch(Exception e){
     println("something wrong");

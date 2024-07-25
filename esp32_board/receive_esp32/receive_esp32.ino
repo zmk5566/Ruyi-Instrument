@@ -16,42 +16,41 @@ const unsigned int localPort = 8888;        // local port to listen for OSC pack
 
 void setup() {
   Serial.begin(115200); // Start the Serial communication to the computer
-  // Start the Serial2 at 9600 baud rate
+  // Start the Serial1 at 9600 baud rate
   // Default pins for UART2 are 16 (RX), 17 (TX)
-  Serial2.begin(115200, SERIAL_8N1, 16, 17);
+  Serial1.begin(115200, SERIAL_8N1, 20, 21);
 
-   // Connect to WiFi network
-    Serial.println();
-    Serial.println();
-    Serial.print("Connecting to bhbhbh");
-    Serial.println(ssid);
+  //  // Connect to WiFi network
+  //   Serial.println();
+  //   Serial.println();
+  //   Serial.print("Connecting to bhbhbh");
+  //   Serial.println(ssid);
     WiFi.begin(ssid, pass);
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
+        //Serial.print(".");
     }
-    Serial.println("");
+    // Serial.println("");
 
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+    // Serial.println("WiFi connected");
+    // Serial.println("IP address: ");
+    // Serial.println(WiFi.localIP());
 
-    Serial.println("Starting UDP");
+    // Serial.println("Starting UDP");
     Udp.begin(localPort);
-    Serial.print("Local port: ");
+    //Serial.print("Local port: ");
 #ifdef ESP32
-    Serial.println(localPort);
+    //Serial.println(localPort);
 #else
-    Serial.println(Udp.localPort());
+    //Serial.println(Udp.localPort());
 #endif
 }
 
 void loop() {
-  // Check if the Serial2 has received any data
-  if (Serial2.available()) {
-    String receivedMessage = Serial2.readStringUntil('\n');
-    Serial.println(receivedMessage); // Print the received message to the Serial Monitor
+  // Check if the Serial1 has received any data
+  if (Serial1.available()) {
+    String receivedMessage = Serial1.readStringUntil('\n');
     sendmessage(receivedMessage);
   }
 }
