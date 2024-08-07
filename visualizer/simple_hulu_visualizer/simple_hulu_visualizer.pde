@@ -5,8 +5,8 @@ import oscP5.*;
 import netP5.*;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
-String[] pitchNames = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
-int pitchShift = 0;
+String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB","B"};
+int pitchShift = -2;
 
 // start defining the situation
 
@@ -154,10 +154,11 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
     int temp_n = temp_condition[0];
     int temp_low = temp_condition[1];
     println(temp_low);
-    if (sensor_value[7]>195){
-            updatePitch(temp_n+pitchShift+36,sensor_value[7]);
+    float temp_value  = sensor_value[7]*1.5;
+    if (temp_value>195){
+            updatePitch(temp_n+pitchShift+36,int(temp_value));
     }else{
-              updatePitch(temp_low+pitchShift+36,sensor_value[7]);
+              updatePitch(temp_low+pitchShift+36,int(temp_value));
     }
     updateGate(255);
     
