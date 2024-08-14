@@ -39,7 +39,7 @@ function draw_score(abc_notation,x_shift, y_shift){
     total_svgContent += draw_base(x_shift, y_shift,total_bar_count);
 
 
-    total_svgContent += draw_the_hover_box(x_shift, y_shift,0.5);
+    total_svgContent += draw_the_hover_box(x_shift, y_shift,-2);
 
     // draw the base 
 
@@ -388,6 +388,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         startTime = Tone.now(); // Capture the start time
         requestAnimationFrame(animateLine); // Start the animation
+    });
+
+    // add the stop button logic 
+    const stopButton = document.getElementById('stopButton');
+    stopButton.addEventListener('click', () => {
+        cancelAnimationFrame(animationFrameId);
+        // Reset the hover box to the initial position
+        move_the_hover_box(x_shift, y_shift,-2);
     });
 
     function animateLine() {
