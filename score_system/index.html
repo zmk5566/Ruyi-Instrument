@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ABC Notation to SVG</title>
+    <script src="bar_helper.js"></script>
+    <style>
+        #svgContainer {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <label for="abcNotation">ABC Notation:</label>
+    <input type="text" id="abcNotation" value="(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2">
+    <button onclick="drawSVG()">Draw</button>
+</div>
+
+<div id="svgContainer"></div>
+
+<script>
+function drawSVG() {
+    const abcNotation = document.getElementById('abcNotation').value;
+    //const svgOutput = parse_notes(abcNotation); // Assuming no shift is needed for this example
+    const svgOutput = draw_score(abcNotation,20,40);
+    //console.log(svgOutput);
+    document.getElementById('svgContainer').innerHTML = svgOutput;
+}
+</script>
+
+</body>
+</html>
