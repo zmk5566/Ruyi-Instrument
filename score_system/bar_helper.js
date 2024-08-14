@@ -1,6 +1,10 @@
 var unit_shift = 40;
-
+var vertical_unit_shift = 80;
 var horizontal_bar_count =3;
+var bpm =60;
+var x_shift = 20;
+var y_shift = 40;
+var total_duration = 0;
 
 
 function draw_score(abc_notation,x_shift, y_shift){
@@ -16,22 +20,89 @@ function draw_score(abc_notation,x_shift, y_shift){
       text-anchor: middle; /* Centers text horizontally */
       dominant-baseline: middle; /* Centers text vertically in some browsers */
     }
+
+    rect {
+        fill: rgba(0, 216, 230, 0.6);
+        stroke-width: 0;
+    
     </style>`;
-    //cluster the notes by bar number nad ===-
+    //cluster the notes by bar number nad ===
+
+    var total_bar_count = Math.floor(note_list[note_list.length-1].bar_number/horizontal_bar_count);
+    console.log("total bar count" + total_bar_count);
 
     
 
 
     total_svgContent += draw_bar(note_list, x_shift, y_shift);
 
+    total_svgContent += draw_base(x_shift, y_shift,total_bar_count);
+
+
+    total_svgContent += draw_the_hover_box(x_shift, y_shift,0.5);
+
+    // draw the base 
+
         // Closing the SVG tag
     total_svgContent += `</svg>`;
     return total_svgContent;
 }
 
+function draw_base(x_shift, y_shift,total_bar_count){
+
+    // create a list of vertical lines to represent the bars
+    var svgContent = "";
+    var currentX = x_shift;
+    var currentY = y_shift - unit_shift/2;
+    for(let i = 0; i < horizontal_bar_count+1; i++){
+        svgContent += `<line x1="${currentX - unit_shift/2}" y1="${currentY}" x2="${currentX - unit_shift/2}" y2="${currentY + vertical_unit_shift*(total_bar_count)+ unit_shift}" stroke="black"/>`;
+        currentX += unit_shift*6;
+    }
+    return svgContent;
+
+
+
+}
+
+function draw_the_hover_box(x_shift, y_shift,current_time){
+
+    // display the hover box
+
+    var svgContent = "";
+    // draw the box with size unit_shift/2,unit_shift
+    // for one bar, it means 3 seconds( 3*60/bpm)
+    // for one quarter note, it means 1.5 seconds
+    // one second will move 40 units
+    // so we can calculate the position of the hover box
+    var currentX = x_shift + current_time*unit_shift-unit_shift/4;
+    console.log("currentX" + currentX);
+    var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+
+    svgContent += `<rect id = "the_hover" x="${currentX}" y="${currentY}" width="${unit_shift/2}" height="${unit_shift}"  stroke="none" stroke-width="0"/>`;
+
+    return svgContent;
+
+
+}
+
+function move_the_hover_box(x_shift, y_shift,current_time){
+
+    var the_hover = document.getElementById("the_hover");
+    var currentX = x_shift + current_time*unit_shift-unit_shift/4;
+    var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+    currentX = currentX % (unit_shift*6*horizontal_bar_count);
+    the_hover.setAttribute("x", currentX);
+    the_hover.setAttribute("y", currentY);
+
+
+
+
+}
+
 function parse_notes(abc_notation){
     // create a note list 
     var note_list = [];
+
     
 
     // split the abc_notation into individual bars, they are separated by "|"
@@ -46,6 +117,8 @@ function parse_notes(abc_notation){
         //splitNotes(bars[i], note_list, i);
         for(let j = 0; j < temp_notes.length; j++){
              var note = parseNoteToMyNotation(temp_notes[j],i);
+             total_duration += note.duration;
+             console.log(total_duration);
              note_list.push(note);
         }
     }
@@ -190,7 +263,7 @@ function draw_bar(note_list, x_shift, y_shift) {
         // draw the note
         if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
             currentX = x_shift;
-            y_shift += unit_shift;
+            y_shift += vertical_unit_shift;
             previous_bar_number = note_list[i].bar_number;
             console.log("new line");
         }
@@ -224,21 +297,21 @@ function splitNotes(input) {
     // This regular expression matches:
     // 1. Grouped notes enclosed in parentheses, capturing the entire grouping.
     // 2. Individual notes with optional commas or numbers following them.
-    const regex = /(\([A-Ga-g][,#b]?([,][0-9]+)?\)|[A-Ga-g][,#b]?[0-9]?)/g;
+    const regex = /(\([A-Ga-g][,#b]?[0-9]?(\s[A-Ga-g][,#b]?[,]?[0-9]*)*\))|([A-Ga-g][,#b]?[0-9]?)/g;
     
     // Use the regex to find matches and return them as an array.
     const matches = input.match(regex);
 
   
     if (matches) {
-      return matches.map(match => match.replace(/\),/, "),")); // Clean up any trailing commas inside parenthesis groups
+      return matches.map(match => match); // Clean up any trailing commas inside parenthesis groups
     } else {
       return []; // Return an empty array if no matches are found
     }
   }
   
   // Example use
-  const input = "(E4 A,2)";
+  const input = "(CA,) (A,C) C2|(CD) (DE) E2";
   console.log(splitNotes(input));
   
 
@@ -258,6 +331,12 @@ function splitNotes(input) {
     let noteValue = null;
     let octave = 4; // Default octave
     let duration = 1; // Default duration
+    let connection = false;
+
+    // check whether the note has "(", if so, mark the connection has true
+    if (abcNote.includes("(")){
+        connection = true;
+    }
 
     // Extract the note, check for octave indicators (',') and duration
     for (let i = 0; i < abcNote.length; i++) {
@@ -280,7 +359,7 @@ function splitNotes(input) {
         y_bar_shift: Math.floor(bar_number/horizontal_bar_count),
         duration: duration,
         bar_number: bar_number,
-        connection: null,
+        connection: connection,
         symbol: null
     };
 }
@@ -296,5 +375,30 @@ var test_node = {
 };
 
 
-var svg_testaaa =  draw_half_note (test_node, 20, 0);
-console.log(svg_testaaa.svgContent);
+document.addEventListener('DOMContentLoaded', (event) => {
+    const startButton = document.getElementById('startButton');
+    let startTime;
+    let animationFrameId;
+
+    startButton.addEventListener('click', () => {
+        // Ensure Tone.js is started
+        if (Tone.context.state !== 'running') {
+            Tone.start();
+        }
+
+        startTime = Tone.now(); // Capture the start time
+        requestAnimationFrame(animateLine); // Start the animation
+    });
+
+    function animateLine() {
+        const currentTime = Tone.now();
+        const timeElapsed = currentTime - startTime; // Time elapsed since button was clicked
+        
+        move_the_hover_box(x_shift, y_shift,timeElapsed);
+
+        // Continue the animation if not reached the end
+        if (timeElapsed < total_duration) {
+            animationFrameId = requestAnimationFrame(animateLine);
+        }
+    }
+});

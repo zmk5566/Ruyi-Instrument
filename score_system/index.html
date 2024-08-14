@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ABC Notation to SVG</title>
+    <script src="js/Tone.js"></script>
     <script src="bar_helper.js"></script>
     <style>
         #svgContainer {
@@ -17,6 +18,8 @@
     <label for="abcNotation">ABC Notation:</label>
     <input type="text" id="abcNotation" value="(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2">
     <button onclick="drawSVG()">Draw</button>
+    <button id="startButton">Start Timing</button>
+    <div id="timePassed">Time Passed: 0 seconds</div>
 </div>
 
 <div id="svgContainer"></div>
