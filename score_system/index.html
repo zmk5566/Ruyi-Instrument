@@ -26,6 +26,9 @@
     <button id="startButton">Start Timing</button>
     <button id="stopButton">Stop Timing</button>
     <div id="timePassed">Time Passed: 0 seconds</div>
+    <button id="sendWebStartButton" >START the Button</button>
+    <button id="sendWebStopButton" >STOP the Button</button>
+
 </div>
 
 <div id="svgContainer"></div>
@@ -36,8 +39,8 @@ function drawSVG() {
     const choice = document.getElementById('choices').value;
 
     // Variables to hold the preset strings
-    let presetString1 = "(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
-    let presetString2 = "(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)|(C4G,2)|(C4G2)|E4C2|A,4 D2|C2E4|(C4G,2)|(C4G2)|(E4A,2)|(C4D2)|(C6|C6)|]";
+    let presetString1 = "Z2Z2Z2|(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
+    let presetString2 = "Z2Z2Z2|(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)|(C4G,2)|(C4G2)|E4C2|A,4 D2|C2E4|(C4G,2)|(C4G2)|(E4A,2)|(C4D2)|(C6|C6)|]";
 
     var abcNotation = "";
     // Display the corresponding string
@@ -46,6 +49,7 @@ function drawSVG() {
     } else if (choice === "2") {
         abcNotation = presetString2;
 }
+
 
 
 

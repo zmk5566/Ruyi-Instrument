@@ -5,6 +5,47 @@ var bpm =60;
 var x_shift = 20;
 var y_shift = 40;
 var total_duration = 0;
+var websocket;
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Connect to the WebSocket server
+    websocket = new WebSocket('ws://localhost:8500');
+    
+    // Event listener for when the connection is open
+    websocket.onopen = function(event) {
+        console.log("Connected to the WebSocket server");
+    };
+
+    // Event listener for when a message is received
+    websocket.onmessage = function(event) {
+        console.log("Message from server:", event.data);
+
+        // if the message contains start, then start the animation
+        if (event.data === "start"){
+            const startButton = document.getElementById('startButton');
+            startButton.click(); 
+        } else if (event.data === "stop"){
+            const stopButton = document.getElementById('stopButton');
+            stopButton.click();
+        }
+    };
+
+
+});
+
+
+function startMS(){
+
+    websocket.send("start");
+}
+
+function stopMS(){
+
+    websocket.send("stop");
+}
 
 
 function draw_score(abc_notation,x_shift, y_shift){
@@ -12,6 +53,10 @@ function draw_score(abc_notation,x_shift, y_shift){
     // draw all the connections
     // draw all the symbols
     var note_list = parse_notes(abc_notation);
+
+        // Add event listener to the button
+    document.getElementById('sendWebStartButton').addEventListener('click', startMS);
+    document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
     
     var total_svgContent = `<svg width="1400" height="600" xmlns="http://www.w3.org/2000/svg">
     <style>
@@ -297,7 +342,7 @@ function splitNotes(input) {
     // This regular expression matches:
     // 1. Grouped notes enclosed in parentheses, capturing the entire grouping.
     // 2. Individual notes with optional commas or numbers following them.
-    const regex = /(\([A-Ga-g][,#b]?[0-9]?(\s[A-Ga-g][,#b]?[,]?[0-9]*)*\))|([A-Ga-g][,#b]?[0-9]?)/g;
+    const regex = /(\([A-Za-z][,#b]?([,][0-9]+)?\)|[A-Za-z][,#b]?[0-9]?)/g;
     
     // Use the regex to find matches and return them as an array.
     const matches = input.match(regex);
@@ -319,6 +364,7 @@ function splitNotes(input) {
     console.log(abcNote);
     // Define a mapping for notes to numbers
     const noteMapping ={
+        "Z": 0,
         "C": 1,
         "D": 2,
         "E": 3,
@@ -410,3 +456,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 });
+
+
