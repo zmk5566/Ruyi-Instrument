@@ -115,13 +115,17 @@ void setGateStatus(float status){
 void oscEvent(OscMessage theOscMessage) {
   /* print the address pattern and the typetag of the received OscMessage */
   println("### received an osc message.");
-
+  
+  if (theOscMessage.addrPattern().contains("50.205")){
   try{
   update_the_sensor(sensor_value,theOscMessage);
     println(sensor_value);
 
   } catch(Exception e){
     println("something wrong");
+  }
+  }else{
+    // do nothing
   }
 
 }
