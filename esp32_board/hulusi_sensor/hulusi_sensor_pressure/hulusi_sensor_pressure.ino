@@ -12,11 +12,7 @@ void setup() {
   // Set up Serial Monitor
   Serial.begin(115200);
   delay(1000);
- 
-  // Set up I2S
-  i2s_install();
-  i2s_setpin();
-  i2s_start(I2S_PORT);
+
   Serial2.begin(115200, SERIAL_8N1, 16, 17);
  
   delay(500);
