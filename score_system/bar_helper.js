@@ -12,7 +12,7 @@ var websocket;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Connect to the WebSocket server
-    websocket = new WebSocket('ws://localhost:8500');
+    websocket = new WebSocket('ws://192.168.50.8:9000');
     
     // Event listener for when the connection is open
     websocket.onopen = function(event) {

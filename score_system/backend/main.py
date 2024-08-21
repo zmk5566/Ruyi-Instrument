@@ -21,7 +21,7 @@ async def broadcast(message):
         await asyncio.gather(*(client.send(message) for client in connected_clients))
 
 async def main():
-    async with websockets.serve(handler, "127.0.0.1", 8500):
+    async with websockets.serve(handler, "192.168.50.8", 9000):
         await asyncio.Future()  # Run forever
 
 if __name__ == "__main__":

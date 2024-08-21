@@ -1,17 +1,20 @@
 //SinOsc sine;
  
- 
+import themidibus.*; //Import the library
 import oscP5.*;
 import netP5.*;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
 String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB","B"};
 int pitchShift = -2;
+int pitch = 0;
+int velocity;
 
 // start defining the situation
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
+MidiBus myBus; // The MidiBus
 
 float r = 0;
 float g = 0;
@@ -28,6 +31,11 @@ void setup() {
 
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this,12000);
+  MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.
+
+  myBus = new MidiBus(new java.lang.Object(), -1, "qqai"); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
+
+  
   
   /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
    * an ip address and a port number. myRemoteLocation is used as parameter in
@@ -83,10 +91,12 @@ void updatePitch(int pitch_value, int breath){
   oscP5.send(myMessage, myRemoteLocation); 
   OscMessage myMessage3 = new OscMessage("/Hulusi/Physical_and_Nonlinearity/Physical_Parameters/Pressure");
   
-  println(breath);
+  //println("breath_level"+breath);
 
   myMessage3.add(map(breath,0,255,0.7,1.0));
   oscP5.send(myMessage3, myRemoteLocation); 
+  
+
 }
 
 
@@ -119,11 +129,11 @@ void oscEvent(OscMessage theOscMessage) {
   NetAddress senderAddress = theOscMessage.netAddress();
   String ipAddress = senderAddress.address();
   if (ipAddress.contains("50.205")){
-     println("### received an osc message."); 
+     //println("### received an osc message."); 
    
   try{
   update_the_sensor(sensor_value,theOscMessage);
-    println(sensor_value);
+    //println(sensor_value);
 
   } catch(Exception e){
     println("something wrong");
@@ -144,7 +154,12 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
             sensor_value[i]=0; 
         }
       }else{
-        sensor_value[i]= theOscMessage.get(i).intValue();
+       
+        sensor_value[i]= theOscMessage.get(i).intValue()-40;
+        
+        if (sensor_value[i]<0){
+          sensor_value[i] = 0;
+        }
         
 
         if (sensor_value[i]<=5){
@@ -161,33 +176,67 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
     int[] temp_condition = findConditionName(sensor_value,json);
     int temp_n = temp_condition[0];
     int temp_low = temp_condition[1];
-    println(temp_low);
+    //println(temp_low);
     float temp_value  = sensor_value[7]*1.5;
     if (temp_value>195){
-            updatePitch(temp_n+pitchShift+36,int(temp_value));
+               updatePitch(temp_n+pitchShift+36,int(temp_value));
+               updateGate(int(temp_value),temp_n+pitchShift+36);
     }else{
-              updatePitch(temp_low+pitchShift+36,int(temp_value));
+               updatePitch(temp_low+pitchShift+36,int(temp_value));
+               updateGate(int(temp_value),temp_n+pitchShift+36);
     }
-    updateGate(255);
     
   
 }
 
 
-void updateGate(int input_breath){
-  if (isTriggered == false && input_breath>0){
-    // set the gate on
-    isTriggered = true;
-    OscMessage myMessage2 = new OscMessage("/Hulusi/Basic_Parameters/gate");
-    myMessage2.add(1);
-    oscP5.send(myMessage2, myRemoteLocation);
+void updateGate(int input_breath,int pitch_value){
+  if (isTriggered == false){
+    
+    if (input_breath>5){
+      // set the gate on
+      isTriggered = true;
+      OscMessage myMessage2 = new OscMessage("/Hulusi/Basic_Parameters/gate");
+      myMessage2.add(1);
+      oscP5.send(myMessage2, myRemoteLocation);    
+      myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
+      pitch = pitch_value;
+      println("send midi out", input_breath);
+    }
+    
+  }else{
+    
+    if (empty_state_counter<=5){
+      // note off the previous note first
+       if (pitch_value!=pitch){
+       myBus.sendNoteOff(0, pitch, 0); // Send a Midi noteOn
+       
+       println("send midi Off", pitch);
+
+       // update the pitch again 
+       myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
+      println("send midi out", pitch_value);
+
+        pitch = pitch_value;
+        
+    }
+    }
+    
+    if (empty_state_counter>5 && pitch!=0){
+         println("initial pitch", pitch, pitch_value);
+
+        isTriggered = false;
+        OscMessage myMessage2 = new OscMessage("/Hulusi/Basic_Parameters/gate");
+        myMessage2.add(0);
+        oscP5.send(myMessage2, myRemoteLocation);
+        
+        myBus.sendNoteOff(0, pitch, 0); // Send a Midi nodeOff
+        pitch = 0;
+        println("send note off", pitch, pitch_value);
+
+
+    
   }
-  
-  if (isTriggered==true && empty_state_counter>5){
-    isTriggered = false;
-    OscMessage myMessage2 = new OscMessage("/Hulusi/Basic_Parameters/gate");
-    myMessage2.add(0);
-    oscP5.send(myMessage2, myRemoteLocation);
   }
 }
 
