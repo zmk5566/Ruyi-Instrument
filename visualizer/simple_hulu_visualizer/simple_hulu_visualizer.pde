@@ -36,7 +36,7 @@ void setup() {
    * and the port of the remote location address are the same, hence you will
    * send messages back to this sketch.
    */
-  myRemoteLocation = new NetAddress("127.0.0.1",7788);
+  myRemoteLocation = new NetAddress("127.0.0.1",7790);
   
 
   //sinewave_update();
@@ -82,10 +82,8 @@ void updatePitch(int pitch_value, int breath){
   /* send the message */
   oscP5.send(myMessage, myRemoteLocation); 
   OscMessage myMessage3 = new OscMessage("/Hulusi/Physical_and_Nonlinearity/Physical_Parameters/Pressure");
-  
-  println(breath);
 
-  myMessage3.add(map(breath,0,255,0.7,1.0));
+  myMessage3.add(map(breath,0,50,0.7,1.0));
   oscP5.send(myMessage3, myRemoteLocation); 
 }
 
@@ -116,11 +114,16 @@ void setGateStatus(float status){
 /* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage theOscMessage) {
   /* print the address pattern and the typetag of the received OscMessage */
-  NetAddress senderAddress = theOscMessage.netAddress();
-  String ipAddress = senderAddress.address();
-  if (ipAddress.contains("50.205")){
-     println("### received an osc message."); 
-   
+  println("### received an osc message.");
+  
+  
+  NetAddress senderAdd = theOscMessage.netAddress();
+  
+  String ipa = senderAdd.address();
+  
+  
+  
+  if (ipa.contains("50.203")){
   try{
   update_the_sensor(sensor_value,theOscMessage);
     println(sensor_value);
