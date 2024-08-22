@@ -56,7 +56,7 @@ void main_loop(){
   }
 
   
- int sensorValue = analogRead(34);
+ int sensorValue = analogRead(26);
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
 
   myArray[7]=constrain(map(sensorValue,115,400,0,255),0,255);
