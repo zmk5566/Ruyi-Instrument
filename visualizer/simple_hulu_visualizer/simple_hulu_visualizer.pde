@@ -123,7 +123,7 @@ void oscEvent(OscMessage theOscMessage) {
   
   
   
-  if (ipa.contains("50.203")){
+  if (ipa.contains("50.206")){
   try{
   update_the_sensor(sensor_value,theOscMessage);
     println(sensor_value);
