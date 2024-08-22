@@ -9,16 +9,20 @@ String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB
 int pitchShift = -2;
 int pitch = 0;
 int velocity;
-
+int ground_adding = 40 ; 
+int the_randomness_limit = 128;
 // start defining the situation
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 MidiBus myBus; // The MidiBus
 
+
 float r = 0;
 float g = 0;
 float b = 0;
+int p_breath = 0;
+int p_random = 0;
 
 int empty_state_counter = 0;
 boolean isTriggered = false;
@@ -33,7 +37,7 @@ void setup() {
   oscP5 = new OscP5(this,12000);
   MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.
 
-  myBus = new MidiBus(new java.lang.Object(), -1, "qqai"); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
+  myBus = new MidiBus(new java.lang.Object(), -1,"VMidi 1"); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
 
   
   
@@ -145,17 +149,23 @@ void oscEvent(OscMessage theOscMessage) {
 }
 
 void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
+    float randomness=0; 
    
     for (int i = 0; i < sensor_value.length;i++){
       if (i<7){
         if (theOscMessage.get(i).intValue()>200){
             sensor_value[i]=1;
+            randomness =randomness+  abs(theOscMessage.get(i).intValue()-255);           
+ 
         }else{
             sensor_value[i]=0; 
+             if (theOscMessage.get(i).intValue()<50){
+            randomness =randomness+  abs(theOscMessage.get(i).intValue());           
+             }
         }
       }else{
        
-        sensor_value[i]= theOscMessage.get(i).intValue()-40;
+        sensor_value[i]= theOscMessage.get(i).intValue()-ground_adding;
         
         if (sensor_value[i]<0){
           sensor_value[i] = 0;
@@ -186,7 +196,35 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
                updateGate(int(temp_value),temp_n+pitchShift+36);
     }
     
+    int inperfection = int(constrain(map(randomness,0,the_randomness_limit,0,255),0,255));
+    
+    println("randomness and mapped cc: ",randomness,inperfection);
+    updateMidiCC(int(temp_value),inperfection);
+    
   
+}
+
+void updateMidiCC(int breath,int inperfection){
+  //if (isTriggered){
+  // number 2 for breath controller
+  
+  if (breath!= p_breath){
+  
+  myBus.sendControllerChange(0, 2, breath/2); // Send a controllerChange
+  
+  }
+  
+  if (inperfection!=p_random){
+  // number 1 for modulation wheel
+    myBus.sendControllerChange(0, 1, inperfection/2); // Send a controllerChange
+  
+  }
+  
+  p_breath = breath;
+  p_random = inperfection;
+  
+
+  //}
 }
 
 
@@ -233,8 +271,6 @@ void updateGate(int input_breath,int pitch_value){
         myBus.sendNoteOff(0, pitch, 0); // Send a Midi nodeOff
         pitch = 0;
         println("send note off", pitch, pitch_value);
-
-
     
   }
   }
@@ -306,10 +342,10 @@ String getCurrentName(int number){
 
 void keyPressed() {
   if (pitchShift <= 13 && pitchShift >= -13){
-  if (keyCode == UP) { // 如果按下的是上箭头键
-    pitchShift++; // 增加pitch shift的值
-  } else if (keyCode == DOWN) { // 如果按下的是下箭头键
-    pitchShift--; // 减少pitch shift的值
-  }
+    if (keyCode == UP) { // 如果按下的是上箭头键
+      pitchShift++; // 增加pitch shift的值
+    } else if (keyCode == DOWN) { // 如果按下的是下箭头键
+      pitchShift--; // 减少pitch shift的值
+    }
   }
 }
