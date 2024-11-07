@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>ABC Notation to SVG</title>
+    <script src="dist/abcjs-basic.js" type="text/javascript"></script>
     <script src="js/Tone.js"></script>
     <script src="bar_helper.js"></script>
-    <script src="dist/abcjs-basic.js" type="text/javascript"></script>
 
     <style>
         #svgContainer {
@@ -39,9 +39,9 @@
 
 
 
-    function getNotes(abc){
+    function getNotes(abc,staff_index){
 		var staff_index = 0;
-		var all_voices = getAllVoices(staff_index);
+		var all_voices = getAllVoices(abc,staff_index);
 		console.log(all_voices);
         return all_voices;
     }
