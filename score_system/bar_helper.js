@@ -7,6 +7,12 @@ var y_shift = 40;
 var total_duration = 0;
 var websocket;
 
+var abc = "T: 月光下的凤尾竹\n" +
+"M: 3/4\n" +
+"L: 1/8\n" +
+"K:G\n" +
+"Q:1/4=88\n" +
+"(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
 
 
 
