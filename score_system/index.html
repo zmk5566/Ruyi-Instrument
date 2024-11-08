@@ -39,49 +39,8 @@
 
 
 
-    function getNotes(abc,staff_index){
-		var staff_index = 0;
-		var all_voices = getAllVoices(abc,staff_index);
-		console.log(all_voices);
-        return all_voices;
-    }
-
-    function getAllVoices(abc,staff_index) {
-            var parsed = ABCJS.parseOnly(abc);
-            console.log(parsed);
-
-			var voices = []; 
-
-			// loop from all the lines
-			for (var i = 0; i < parsed[0].lines.length; i++) {
-				var line = parsed[0].lines[i];
-				// loop through all the staffs
-				//get the staff_index staff
-				// console.log(line);
-				// console.log(line.staff);
-
-				// if the staff exists
-
-				if (line.staff) {
-						if (line.staff[staff_index]) {
-						var staff = line.staff[staff_index];
-						// loop through all the voices,then append the voice to the voices array
-						var temp_voices = staff.voices[0];
-						console.log(temp_voices);
-						for (var j = 0; j < temp_voices.length; j++) {
-							voices.push(temp_voices[j]);
-						}
-					}
-					//console.log(line.staff[staff_index]);
-				}
 
 
-
-
-			}
-
-			return voices;
-		}
 
 
 
@@ -91,17 +50,12 @@ function drawSVG() {
 
     const choice = document.getElementById('choices').value;
 
-    // Variables to hold the preset strings
-    let presetString1 = "Z2Z2Z2|(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
-    let presetString2 = "Z2Z2Z2|(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)|(C4G,2)|(C4G2)|E4C2|A,4 D2|C2E4|(C4G,2)|(C4G2)|(E4A,2)|(C4D2)|(C6|C6)|]";
-
-
     var abcNotation = "";
     // Display the corresponding string
     if (choice === "1") {
-        abcNotation = presetString1;
+        abcNotation = abc;
     } else if (choice === "2") {
-        abcNotation = presetString2;
+        abcNotation = bac;
 }
 
 

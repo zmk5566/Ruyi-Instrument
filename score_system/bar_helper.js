@@ -43,6 +43,67 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+function getNotes(abc,staff_index){
+    var staff_index = 0;
+    var all_voices = getAllVoices(abc,staff_index);
+    console.log(all_voices);
+    return all_voices;
+}
+
+// write a function to translate the abc notation to the note list format we are using here
+function abcToNoteList(abc){
+    var notes = getNotes(abc,0);
+
+    var all_notes = splitArrayByBarType(notes);
+    console.log(all_notes);
+
+    // do parse_notes_og_abc
+    var all_notes_og_abc = parse_notes_og_abc(all_notes);
+
+    return all_notes_og_abc;
+}
+
+
+function getAllVoices(abc,staff_index) {
+        var parsed = ABCJS.parseOnly(abc);
+        console.log(parsed);
+
+        var voices = []; 
+
+        // loop from all the lines
+        for (var i = 0; i < parsed[0].lines.length; i++) {
+            var line = parsed[0].lines[i];
+            // loop through all the staffs
+            //get the staff_index staff
+            // console.log(line);
+            // console.log(line.staff);
+
+            // if the staff exists
+
+            if (line.staff) {
+                    if (line.staff[staff_index]) {
+                    var staff = line.staff[staff_index];
+                    // loop through all the voices,then append the voice to the voices array
+                    var temp_voices = staff.voices[0];
+                    console.log(temp_voices);
+                    for (var j = 0; j < temp_voices.length; j++) {
+                        voices.push(temp_voices[j]);
+                    }
+                }
+                //console.log(line.staff[staff_index]);
+            }
+
+
+
+
+        }
+
+        return voices;
+    }
+
+
+
+
 function startMS(){
 
     websocket.send("start");
@@ -54,11 +115,73 @@ function stopMS(){
 }
 
 
+function getNotes(abc,staff_index){
+    var staff_index = 0;
+    var all_voices = getAllVoices(abc,staff_index);
+    console.log(all_voices);
+    return all_voices;
+}
+
+// write a function to translate the abc notation to the note list format we are using here
+function abcToNoteList(abc){
+    var notes = getNotes(abc,0);
+
+    var all_notes = splitArrayByBarType(notes);
+    console.log(all_notes);
+
+    // do parse_notes_og_abc
+    var all_notes_og_abc = parse_notes_og_abc(all_notes);
+
+    return all_notes_og_abc;
+}
+
+
+function getAllVoices(abc,staff_index) {
+        var parsed = ABCJS.parseOnly(abc);
+        console.log(parsed);
+
+        var voices = []; 
+
+        // loop from all the lines
+        for (var i = 0; i < parsed[0].lines.length; i++) {
+            var line = parsed[0].lines[i];
+            // loop through all the staffs
+            //get the staff_index staff
+            // console.log(line);
+            // console.log(line.staff);
+
+            // if the staff exists
+
+            if (line.staff) {
+                    if (line.staff[staff_index]) {
+                    var staff = line.staff[staff_index];
+                    // loop through all the voices,then append the voice to the voices array
+                    var temp_voices = staff.voices[0];
+                    console.log(temp_voices);
+                    for (var j = 0; j < temp_voices.length; j++) {
+                        voices.push(temp_voices[j]);
+                    }
+                }
+                //console.log(line.staff[staff_index]);
+            }
+
+
+
+
+        }
+
+        return voices;
+    }
+
+
+
+
 function draw_score(abc_notation,x_shift, y_shift){
     // draw all the notes
     // draw all the connections
     // draw all the symbols
-    var note_list = parse_notes(abc_notation);
+    //var note_list = parse_notes(abc_notation);
+    var note_list = abcToNoteList(abc_notation);
 
         // Add event listener to the button
     document.getElementById('sendWebStartButton').addEventListener('click', startMS);
@@ -89,6 +212,8 @@ function draw_score(abc_notation,x_shift, y_shift){
 
     total_svgContent += draw_base(x_shift, y_shift,total_bar_count);
 
+    total_svgContent += draw_beam(note_list, x_shift, y_shift);
+
 
     total_svgContent += draw_the_hover_box(x_shift, y_shift,-2);
 
@@ -98,6 +223,70 @@ function draw_score(abc_notation,x_shift, y_shift){
     total_svgContent += `</svg>`;
     return total_svgContent;
 }
+
+
+function draw_beam(note_list, x_shift, y_shift) {
+    let svgContent = "";
+    let beamStartX = 0;
+    let beamEndX = 0;
+    let beamY = y_shift - 10; // Example offset above the notes
+    let inBeam = false;
+
+    var currentX = x_shift ;
+    var previous_bar_number = 0;
+
+    note_list.forEach((note, index) => {
+        // Assuming draw_note provides the X position for each note
+        let temp_object = draw_note (note, x_shift, y_shift);
+
+
+        // if (note_list[index].bar_number !== previous_bar_number && note_list[index].bar_number%horizontal_bar_count== 0){
+        //     currentX = x_shift;
+        //     y_shift += vertical_unit_shift;
+        //     previous_bar_number = note_list[index].bar_number;      
+        //     beamY = y_shift - 10;      
+        //     console.log("new line");
+        // }
+
+        var beamY = y_shift - unit_shift/2 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+        var beamX = x_shift% (unit_shift*6*horizontal_bar_count);
+
+
+
+        console.log("inside the beam loop");
+        console.log(temp_object);
+        
+        // If current note starts a beam
+        if (note.symbol === "start_beam") {
+            beamStartX = beamX;
+            inBeam = true;
+        }
+        
+
+
+        // If current note ends a beam
+        if ( note.symbol ===  "end_beam" && inBeam) {
+            beamEndX = beamX;
+            // Draw the beam from beamStartX to beamEndX at beamY height
+            svgContent += `<line x1="${beamStartX}" y1="${beamY}" x2="${beamEndX}" y2="${beamY}" stroke="black" stroke-width="2"/>`;
+            
+
+    
+            console.log("beam content");
+            console.log(svgContent);
+            console.log("beam status",beamStartX, beamEndX, beamY);
+            
+            inBeam = false; // Reset the flag as the beam has ended
+        }
+
+                // Update x_shift for the next note
+                x_shift = temp_object.currentX;
+
+    });
+
+    return svgContent;
+}
+
 
 function draw_base(x_shift, y_shift,total_bar_count){
 
@@ -150,6 +339,8 @@ function move_the_hover_box(x_shift, y_shift,current_time){
 
 }
 
+
+
 function parse_notes(abc_notation){
     // create a note list 
     var note_list = [];
@@ -168,6 +359,79 @@ function parse_notes(abc_notation){
         //splitNotes(bars[i], note_list, i);
         for(let j = 0; j < temp_notes.length; j++){
              var note = parseNoteToMyNotation(temp_notes[j],i);
+             total_duration += note.duration;
+             console.log(total_duration);
+             note_list.push(note);
+        }
+    }
+
+    console.log(note_list);
+    return note_list;
+        //parseNoteABC(bars[i], note_list,i);parseNoteABC
+
+
+}
+
+
+function splitArrayByBarType(data) {
+    const result = [];
+    let currentGroup = [];
+
+    data.forEach(item => {
+        // Check if the item has a 'type' key and includes 'bar' in its value
+        if (item.type && item.type.includes('bar')) {
+            // When a bar is found, push the current group to the result
+            // and start a new group only if the current group is not empty
+            if (currentGroup.length > 0) {
+                result.push(currentGroup);
+                currentGroup = [];
+            }
+            // Optionally, include the bar element itself into the result as a separate group
+            // Uncomment the next line if you want each bar element to be in its own group
+            // result.push([item]);
+        } else {
+            // Add the item to the current group
+            currentGroup.push(item);
+        }
+    });
+
+    // After the loop, add any remaining items as the last group
+    if (currentGroup.length > 0) {
+        result.push(currentGroup);
+    }
+
+    return result;
+}
+
+
+
+
+
+
+
+function parse_notes_og_abc(abc_notation){
+    // create a note list 
+    var note_list = [];
+
+    
+
+    // split the abc_notation into individual bars, they are separated by "|"
+    var bars = splitArrayByBarType(abc_notation)[0];
+
+
+    console.log("bars");
+    console.log(bars);
+    // iterate through the bars and parse the notes
+    for(let i = 0; i < bars.length; i++){
+        var temp_notes = bars[i];
+        console.log("temp_notes");
+        console.log(temp_notes);
+        //splitNotes(bars[i], note_list, i);
+        for(let j = 0; j < temp_notes.length; j++){
+            console.log("temp_notes[j]");
+            console.log(temp_notes[j]);
+             var note = parseAbcNoteToMyNotation(temp_notes[j],i);
+             
              total_duration += note.duration;
              console.log(total_duration);
              note_list.push(note);
@@ -366,6 +630,75 @@ function splitNotes(input) {
   console.log(splitNotes(input));
   
 
+// parse a abc notation style note to my style
+// here is an example of abc notation
+//    {
+//     "pitches": [
+//         {
+//             "pitch": 0,
+//             "name": "C",
+//             "startSlur": [
+//                 {
+//                     "label": 101
+//                 }
+//             ],
+//             "verticalPos": 0
+//         }
+//     ],
+//     "duration": 0.125,
+//     "el_type": "note",
+//     "startChar": 38,
+//     "endChar": 40,
+//     "startBeam": true
+// }
+
+function parseAbcNoteToMyNotation(abcNote, bar_number) {
+    // Define a mapping for notes to numbers
+    console.log(abcNote);
+
+    // write a function if the abcNote.pitches is less than 0, then add 7 to it and decrease the octave by 1
+
+
+
+
+
+    var note = abcNote.pitches[0].pitch;
+    var octave = 3;
+    var connection = false;
+    if (note < 0){
+        note+= 7;
+        octave -= 1;
+    }
+
+    console.log("current pitch");
+    console.log(abcNote.pitches[0].pitch);
+
+    // check whether it exist a key called startBeam, if so, mark the symbol has true
+    var symbol = "";
+
+    if (abcNote.startBeam){
+        symbol = "start_beam";
+    }
+    // if whether it exist a key called endBeam, if so, mark the symbol has true
+    if (abcNote.endBeam){
+        console.log("actual end beam")
+        symbol = "end_beam";
+    }
+
+
+    return {
+        note: note+1,
+        octave: octave,
+        y_bar_shift: Math.floor(bar_number/horizontal_bar_count),
+        duration: parseInt(abcNote.duration/0.125),
+        bar_number: bar_number,
+        connection: connection,
+        symbol: symbol
+    };
+
+}
+
+
   function parseNoteToMyNotation(abcNote, bar_number) {
     console.log(abcNote);
     // Define a mapping for notes to numbers
@@ -379,6 +712,7 @@ function splitNotes(input) {
         "A": 6,
         "B": 7
     };
+
     // Initial values
     let noteValue = null;
     let octave = 4; // Default octave
@@ -404,6 +738,7 @@ function splitNotes(input) {
             break; // Exit loop once duration is found
         }
     }
+
 
     return {
         note: noteValue,
