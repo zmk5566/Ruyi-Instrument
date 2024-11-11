@@ -210,7 +210,7 @@ function draw_score(abc_notation,x_shift, y_shift){
 
     total_svgContent += draw_bar(note_list, x_shift, y_shift);
 
-    total_svgContent += draw_base(x_shift, y_shift,total_bar_count);
+    total_svgContent += draw_base(note_list, x_shift, y_shift);
 
     total_svgContent += draw_beam(note_list, x_shift, y_shift);
 
@@ -248,7 +248,7 @@ function draw_beam(note_list, x_shift, y_shift) {
         //     console.log("new line");
         // }
 
-        var beamY = y_shift - unit_shift/2 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+        var beamY = y_shift + unit_shift/4 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
         var beamX = x_shift% (unit_shift*6*horizontal_bar_count);
 
 
@@ -258,7 +258,7 @@ function draw_beam(note_list, x_shift, y_shift) {
         
         // If current note starts a beam
         if (note.symbol === "start_beam") {
-            beamStartX = beamX;
+            beamStartX = beamX-unit_shift/4;
             inBeam = true;
         }
         
@@ -266,12 +266,11 @@ function draw_beam(note_list, x_shift, y_shift) {
 
         // If current note ends a beam
         if ( note.symbol ===  "end_beam" && inBeam) {
-            beamEndX = beamX;
-            // Draw the beam from beamStartX to beamEndX at beamY height
-            svgContent += `<line x1="${beamStartX}" y1="${beamY}" x2="${beamEndX}" y2="${beamY}" stroke="black" stroke-width="2"/>`;
+            beamEndX = beamX+unit_shift/4;
             
-
-    
+            // draw the beam
+            svgContent += `<line x1="${beamStartX}" y1="${beamY}" x2="${beamEndX}" y2="${beamY}" stroke="black" stroke-width="1"/>`;
+            
             console.log("beam content");
             console.log(svgContent);
             console.log("beam status",beamStartX, beamEndX, beamY);
@@ -288,16 +287,80 @@ function draw_beam(note_list, x_shift, y_shift) {
 }
 
 
-function draw_base(x_shift, y_shift,total_bar_count){
+function draw_base(note_list,x_shift, y_shift){
+    
 
-    // create a list of vertical lines to represent the bars
+    // Initial setup for the SVG content
+
+    var currentX = x_shift ;
     var svgContent = "";
-    var currentX = x_shift;
-    var currentY = y_shift - unit_shift/2;
-    for(let i = 0; i < horizontal_bar_count+1; i++){
-        svgContent += `<line x1="${currentX - unit_shift/2}" y1="${currentY}" x2="${currentX - unit_shift/2}" y2="${currentY + vertical_unit_shift*(total_bar_count)+ unit_shift}" stroke="black"/>`;
-        currentX += unit_shift*6;
+    var previous_bar_number = 0;
+    var curr_bar_number = 0;
+    
+    // draw notes
+    // loop through the note list
+    for(let i = 0; i < note_list.length; i++){
+
+
+
+
+        // draw the note
+        if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
+
+      //draw the end of the bar line
+
+
+            //currentX = x_shift;
+            //y_shift += vertical_unit_shift;
+            //previous_bar_number = note_list[i].bar_number;
+            console.log("new line");
+        }
+
+        if (note_list[i].bar_number !== curr_bar_number){
+            // draw a line to separate the bars
+            svgContent += `<line x1="${currentX-unit_shift/2}" y1="${y_shift-unit_shift/2}" x2="${currentX-unit_shift/2}" y2="${y_shift+vertical_unit_shift/2-unit_shift/2}" stroke="black" stroke-width="1.5"/>`;
+            curr_bar_number = note_list[i].bar_number;
+            }
+
+            if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
+
+                //draw the end of the bar line
+          
+          
+                      currentX = x_shift;
+                      y_shift += vertical_unit_shift;
+                      previous_bar_number = note_list[i].bar_number;
+                      console.log("new line");
+                  }
+
+            var temp_object = draw_note (note_list[i], currentX, y_shift);
+            console.log(note_list[i]);
+            console.log(temp_object);
+            temp_svgContent =temp_object.svgContent;
+            currentX = temp_object.currentX;
+
+
+        //console.log(temp_svgContent);
+        //svgContent +=  temp_svgContent;
+
+        // if this is the last note, then draw the great double bar line
+        if (i == note_list.length-1){
+            svgContent += `<line x1="${currentX-unit_shift/2-3}" y1="${y_shift-unit_shift/2}" x2="${currentX-unit_shift/2-3}" y2="${y_shift+vertical_unit_shift/2-unit_shift/2}" stroke="black" stroke-width="1.5"/>`;
+            svgContent += `<line x1="${currentX-unit_shift/2+3}" y1="${y_shift-unit_shift/2}" x2="${currentX-unit_shift/2+3}" y2="${y_shift+vertical_unit_shift/2-unit_shift/2}" stroke="black" stroke-width="4"/>`;
+
+        }
+
+
+
+         
     }
+
+
+
+    return svgContent;
+
+
+
     return svgContent;
 
 
@@ -452,7 +515,14 @@ function draw_quarter_note (note, currentX, y_shift){
                 // Drawing two notes as per example, hardcoded positions which can be made dynamic
     var svgContent = "";
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
-    svgContent += `<line x1="${currentX - 10}" y1="${y_shift + 10}" x2="${currentX + 10}" y2="${y_shift + 10}" stroke="black"/>`;
+    
+    
+    // check does the note exist a beam, if not draw a line
+    if (note.symbol === "start_beam"|| note.symbol === "end_beam"){
+//do nothing
+    }else{
+    svgContent += `<line x1="${currentX - 10}" y1="${y_shift + 10}" x2="${currentX + 10}" y2="${y_shift + 10}" stroke="black"/> stroke-width="1"`;
+    }   
     if (note.octave === 2) {
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
@@ -469,6 +539,7 @@ function draw_half_note (note, currentX, y_shift){
     var svgContent = "";
 
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
+
     if (note.octave === 2) {
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
@@ -498,6 +569,10 @@ function draw_whole_note (note, currentX, y_shift){
     if (note.octave === 2) {
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
+
+     // draw a line instead of -, which is a half note
+    svgContent += `<line x1="${currentX +unit_shift*2- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*2}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
+
     currentX += unit_shift*4;
 
     return {svgContent, currentX};
@@ -511,7 +586,15 @@ function draw_dotted_whole_note (note, currentX, y_shift){
     if (note.octave === 2) {
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
+
+    // draw a line instead of -, which is a half note
+    svgContent += `<line x1="${currentX +unit_shift*2- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*2}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
+    svgContent += `<line x1="${currentX +unit_shift*4- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*4}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
+
+
     currentX += unit_shift*6;
+
+ 
 
     return {svgContent, currentX};
 }
@@ -523,6 +606,9 @@ function draw_double_whole_note (note, currentX, y_shift){
     if (note.octave === 2) {
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
+
+    svgContent += `<line x1="${currentX +unit_shift*2- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*2}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
+    svgContent += `<line x1="${currentX +unit_shift*4- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*4}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
     currentX += unit_shift*8;
 
     return {svgContent, currentX};
@@ -575,13 +661,19 @@ function draw_bar(note_list, x_shift, y_shift) {
     // draw notes
     // loop through the note list
     for(let i = 0; i < note_list.length; i++){
+
         // draw the note
         if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
+
+      //draw the end of the bar line
+
+
             currentX = x_shift;
             y_shift += vertical_unit_shift;
             previous_bar_number = note_list[i].bar_number;
             console.log("new line");
         }
+
         var temp_object = draw_note (note_list[i], currentX, y_shift);
         console.log(note_list[i]);
         console.log(temp_object);
@@ -589,6 +681,9 @@ function draw_bar(note_list, x_shift, y_shift) {
         currentX = temp_object.currentX;
         //console.log(temp_svgContent);
         svgContent +=  temp_svgContent;
+
+
+
          
     }
 
