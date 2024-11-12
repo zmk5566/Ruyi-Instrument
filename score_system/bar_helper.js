@@ -12,7 +12,7 @@ var abc = "T: 月光下的凤尾竹\n" +
 "L: 1/8\n" +
 "K:G\n" +
 "Q:1/4=88\n" +
-"(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
+"(CuA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
 
 
 
@@ -214,6 +214,8 @@ function draw_score(abc_notation,x_shift, y_shift){
 
     total_svgContent += draw_beam(note_list, x_shift, y_shift);
 
+    total_svgContent += draw_slur(note_list, x_shift, y_shift);
+
 
     total_svgContent += draw_the_hover_box(x_shift, y_shift,-2);
 
@@ -256,8 +258,6 @@ function draw_beam(note_list, x_shift, y_shift) {
         var beamY = y_shift + unit_shift/4 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
         var beamX = x_shift% (unit_shift*6*horizontal_bar_count);
 
-
-
         
         //console.log("inside the beam loop");
         //console.log(temp_object);
@@ -291,6 +291,74 @@ function draw_beam(note_list, x_shift, y_shift) {
     });
 
     return svgContent;
+}
+
+
+function draw_slur(note_list, x_shift, y_shift) {
+    let svgContent = "";
+    let beamStartX = 0;
+    let beamEndX = 0;
+    let inBeam = false;
+
+    var currentX = x_shift ;
+    var previous_bar_number = 0;
+
+    note_list.forEach((note, index) => {
+        // Assuming draw_note provides the X position for each note
+        let temp_object = draw_note (note, x_shift, y_shift);
+
+
+        // if (note_list[index].bar_number !== previous_bar_number && note_list[index].bar_number%horizontal_bar_count== 0){
+        //     currentX = x_shift;
+        //     y_shift += vertical_unit_shift;
+        //     previous_bar_number = note_list[index].bar_number;      
+        //     beamY = y_shift - 10;      
+        //     console.log("new line");
+        // }
+
+        var beamY = y_shift - unit_shift/6*2.5 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+        var beamX = x_shift% (unit_shift*6*horizontal_bar_count);
+
+
+
+        
+        //console.log("inside the beam loop");
+        //console.log(temp_object);
+        
+        // If current note starts a beam
+        if (note.connection.is_connected && note.connection.start) {
+            beamStartX = beamX;
+            inBeam = true;
+        }
+        
+
+
+        // If current note ends a beam
+        if ( note.connection.is_connected && note.connection.end && inBeam) {
+            beamEndX = beamX;
+            
+            // draw the beam
+            //svgContent += `<line x1="${beamStartX}" y1="${beamY}" x2="${beamEndX}" y2="${beamY}" stroke="black" stroke-width="1"/>`;
+            // draw the slur line
+            // make sure the top point is the middle x position between the start and end
+
+            var middleX = (beamStartX + beamEndX)/2;
+            var middleY = beamY - (beamEndX-beamStartX)/6;
+            svgContent += `<path d="M ${beamStartX} ${beamY} Q ${middleX} ${middleY} ${beamEndX} ${beamY}" stroke="black" fill="none" stroke-width="1"/>`;
+            //console.log("beam content");
+            //console.log(svgContent);
+            //console.log("beam status",beamStartX, beamEndX, beamY);
+            
+            inBeam = false; // Reset the flag as the beam has ended
+        }
+
+                // Update x_shift for the next note
+                x_shift = temp_object.currentX;
+
+    });
+
+    return svgContent;
+
 }
 
 
@@ -337,7 +405,7 @@ function draw_base(note_list,x_shift, y_shift){
                       currentX = x_shift;
                       y_shift += vertical_unit_shift;
                       previous_bar_number = note_list[i].bar_number;
-                      console.log("new line");
+                      //console.log("new line");
                   }
 
             var temp_object = draw_note (note_list[i], currentX, y_shift);
@@ -385,7 +453,7 @@ function draw_the_hover_box(x_shift, y_shift,current_time){
     // one second will move 40 units
     // so we can calculate the position of the hover box
     var currentX = x_shift + current_time*unit_shift-unit_shift/4;
-    console.log("currentX" + currentX);
+    //console.log("currentX" + currentX);
     var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
 
     svgContent += `<rect id = "the_hover" x="${currentX}" y="${currentY}" width="${unit_shift/2}" height="${unit_shift}"  stroke="none" stroke-width="0"/>`;
@@ -410,37 +478,6 @@ function move_the_hover_box(x_shift, y_shift,current_time){
 }
 
 
-
-function parse_notes(abc_notation){
-    // create a note list 
-    var note_list = [];
-
-    
-
-    // split the abc_notation into individual bars, they are separated by "|"
-    var bars = abc_notation.split("|");
-
-
-
-    //console.log(bars);
-    // iterate through the bars and parse the notes
-    for(let i = 0; i < bars.length; i++){
-        var temp_notes = splitNotes(bars[i]);
-        //splitNotes(bars[i], note_list, i);
-        for(let j = 0; j < temp_notes.length; j++){
-             var note = parseNoteToMyNotation(temp_notes[j],i);
-             total_duration += note.duration;
-             console.log(total_duration);
-             note_list.push(note);
-        }
-    }
-
-    console.log(note_list);
-    return note_list;
-        //parseNoteABC(bars[i], note_list,i);parseNoteABC
-
-
-}
 
 
 function splitArrayByBarType(data) {
@@ -490,32 +527,32 @@ function parse_notes_og_abc(abc_notation){
 
 
     console.log("bars");
-    console.log(bars);
+    console.log(splitArrayByBarType(abc_notation[0]));
     // iterate through the bars and parse the notes
     for(let i = 0; i < bars.length; i++){
         var temp_notes = bars[i];
-        console.log("temp_notes");
-        console.log(temp_notes);
+        //console.log("temp_notes");
+        //console.log(temp_notes);
         //splitNotes(bars[i], note_list, i);
         for(let j = 0; j < temp_notes.length; j++){
-            console.log("temp_notes[j]");
-            console.log(temp_notes[j]);
+            //console.log("temp_notes[j]");
+            //console.log(temp_notes[j]);
              var note = parseAbcNoteToMyNotation(temp_notes[j],i);
              
              total_duration += note.duration;
-             console.log(total_duration);
+             //console.log(total_duration);
              note_list.push(note);
         }
     }
 
-    console.log(note_list);
+    //console.log(note_list);
     return note_list;
         //parseNoteABC(bars[i], note_list,i);parseNoteABC
 
 
 }
 
-function draw_quarter_note (note, currentX, y_shift){
+function draw_quarter_note (note, decoration_svg,currentX, y_shift){
     // draw a quarter note
     // x_shift and y_shift are the coordinates of the note
     // the note is drawn at the coordinates (x_shift, y_shift)
@@ -536,12 +573,13 @@ function draw_quarter_note (note, currentX, y_shift){
 
     // Update the currentX position for the next note
     currentX += unit_shift;
-    
+    svgContent+= decoration_svg;
+
     return {svgContent, currentX};
 }
 
 
-function draw_half_note (note, currentX, y_shift){
+function draw_half_note (note, decoration_svg,currentX, y_shift){
     
     var svgContent = "";
 
@@ -553,11 +591,12 @@ function draw_half_note (note, currentX, y_shift){
     currentX += unit_shift*2;
 
     //console.log(svgContent);
+    svgContent+= decoration_svg;
 
     return {svgContent, currentX};
 }
 
-function draw_dotted_half_note (note, currentX, y_shift){
+function draw_dotted_half_note (note, decoration_svg,currentX, y_shift){
 
     var svgContent = "";
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
@@ -565,11 +604,12 @@ function draw_dotted_half_note (note, currentX, y_shift){
         svgContent += `<circle r="2" cx="${currentX}" cy="${y_shift + 15}" fill="black" />`;
     }
     currentX += unit_shift*1.5;
+    svgContent+= decoration_svg;
 
     return {svgContent, currentX};
 }
 
-function draw_whole_note (note, currentX, y_shift){
+function draw_whole_note (note, decoration_svg,currentX, y_shift){
 
     var svgContent = "";
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
@@ -582,11 +622,13 @@ function draw_whole_note (note, currentX, y_shift){
 
     currentX += unit_shift*4;
 
+    svgContent+= decoration_svg;
+
     return {svgContent, currentX};
 }
 
 
-function draw_dotted_whole_note (note, currentX, y_shift){
+function draw_dotted_whole_note (note, decoration_svg,currentX, y_shift){
 
     var svgContent = "";
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
@@ -601,12 +643,15 @@ function draw_dotted_whole_note (note, currentX, y_shift){
 
     currentX += unit_shift*6;
 
- 
+    svgContent+= decoration_svg;
+
+    //console.log(decoration_svg)
+
 
     return {svgContent, currentX};
 }
 
-function draw_double_whole_note (note, currentX, y_shift){
+function draw_double_whole_note (note,decoration_svg, currentX, y_shift){
 
     var svgContent = "";
     svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
@@ -617,6 +662,8 @@ function draw_double_whole_note (note, currentX, y_shift){
     svgContent += `<line x1="${currentX +unit_shift*2- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*2}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
     svgContent += `<line x1="${currentX +unit_shift*4- 7}" y1="${y_shift}" x2="${currentX + 7+unit_shift*4}" y2="${y_shift }" stroke="black" stroke-width="2"/> `;
     currentX += unit_shift*8;
+
+    svgContent+= decoration_svg;
 
     return {svgContent, currentX};
 }
@@ -629,21 +676,33 @@ function draw_note (note, x_shift, y_shift){
 
     var y_shift = y_shift;
 
+    var temp_svgContent = "";
+
+    // draw the decorations
+    if (note.decorations){
+        for (let i = 0; i < note.decorations.length; i++){
+            if (note.decorations[i] === "upbow"){
+                var temp_y_shift = y_shift- unit_shift/6*4;
+                temp_svgContent = `<text x="${x_shift-unit_shift/4}" y="${temp_y_shift}" class="small">v</text>`;
+            }
+        }
+    }
+
     switch(note.duration){
         case 1:
-            return draw_quarter_note(note, x_shift, y_shift);
+            return draw_quarter_note(note,temp_svgContent, x_shift, y_shift);
         case 2:
-            return draw_half_note(note, x_shift, y_shift);
+            return draw_half_note(note, temp_svgContent,x_shift, y_shift);
         case 3:
-            return draw_dotted_half_note(note, x_shift, y_shift);
+            return draw_dotted_half_note(note, temp_svgContent,x_shift, y_shift);
         case 4:
-            return draw_whole_note(note, x_shift, y_shift);
+            return draw_whole_note(note, temp_svgContent,x_shift, y_shift);
         case 5:
-            return draw_dotted_whole_note(note, x_shift, y_shift); 
+            return draw_dotted_whole_note(note, temp_svgContent,x_shift, y_shift); 
         case 6:
-            return draw_dotted_whole_note(note, x_shift, y_shift);
+            return draw_dotted_whole_note(note, temp_svgContent,x_shift, y_shift);
         default:
-            return draw_quarter_note(note, x_shift, y_shift);
+            return draw_quarter_note(note, temp_svgContent,x_shift, y_shift);
     }
 
 
@@ -678,15 +737,15 @@ function draw_bar(note_list, x_shift, y_shift) {
             currentX = x_shift;
             y_shift += vertical_unit_shift;
             previous_bar_number = note_list[i].bar_number;
-            console.log("new line");
+            //console.log("new line");
         }
 
         note_list[i].y_pos = y_shift;
         note_list[i].x_pos = currentX;
 
         var temp_object = draw_note (note_list[i], currentX, y_shift);
-        console.log(note_list[i]);
-        console.log(temp_object);
+        //console.log(note_list[i]);
+        //console.log(temp_object);
         temp_svgContent =temp_object.svgContent;
         currentX = temp_object.currentX;
         //console.log(temp_svgContent);
@@ -757,7 +816,7 @@ function splitNotes(input) {
 
 function parseAbcNoteToMyNotation(abcNote, bar_number) {
     // Define a mapping for notes to numbers
-    console.log(abcNote);
+    //console.log(abcNote);
 
     // write a function if the abcNote.pitches is less than 0, then add 7 to it and decrease the octave by 1
 
@@ -773,8 +832,8 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         octave -= 1;
     }
 
-    console.log("current pitch");
-    console.log(abcNote.pitches[0].pitch);
+    //console.log("current pitch");
+    //console.log(abcNote.pitches[0].pitch);
 
     // check whether it exist a key called startBeam, if so, mark the symbol has true
     var symbol = "";
@@ -784,7 +843,7 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
     }
     // if whether it exist a key called endBeam, if so, mark the symbol has true
     if (abcNote.endBeam){
-        console.log("actual end beam")
+        //console.log("actual end beam")
         symbol = "end_beam";
     }
 
@@ -807,6 +866,9 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         duration: parseInt(abcNote.duration/0.125),
         bar_number: bar_number,
         connection: connection,
+        x_pos: -1,
+        y_pos: -1,
+        decorations: abcNote.decoration,
         symbol: symbol
     };
 
@@ -863,7 +925,8 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         connection: connection,
         symbol: null,
         x_pos: -1,
-        y_pos: -1
+        y_pos: -1,
+        decorations: []
     };
 }
 
@@ -876,7 +939,8 @@ var test_node = {
     "connection": null,
     "symbol": null,
     "x_pos": -1,
-    "y_pos": -1
+    "y_pos": -1,
+    "decorations": []
 };
 
 
