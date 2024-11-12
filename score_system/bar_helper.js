@@ -217,6 +217,11 @@ function draw_score(abc_notation,x_shift, y_shift){
 
     total_svgContent += draw_the_hover_box(x_shift, y_shift,-2);
 
+
+    console.log("finished drawing the bar");
+    console.log(note_list);
+
+
     // draw the base 
 
         // Closing the SVG tag
@@ -253,8 +258,9 @@ function draw_beam(note_list, x_shift, y_shift) {
 
 
 
-        console.log("inside the beam loop");
-        console.log(temp_object);
+        
+        //console.log("inside the beam loop");
+        //console.log(temp_object);
         
         // If current note starts a beam
         if (note.symbol === "start_beam") {
@@ -271,9 +277,10 @@ function draw_beam(note_list, x_shift, y_shift) {
             // draw the beam
             svgContent += `<line x1="${beamStartX}" y1="${beamY}" x2="${beamEndX}" y2="${beamY}" stroke="black" stroke-width="1"/>`;
             
-            console.log("beam content");
-            console.log(svgContent);
-            console.log("beam status",beamStartX, beamEndX, beamY);
+            
+            //console.log("beam content");
+            //console.log(svgContent);
+            //console.log("beam status",beamStartX, beamEndX, beamY);
             
             inBeam = false; // Reset the flag as the beam has ended
         }
@@ -334,8 +341,8 @@ function draw_base(note_list,x_shift, y_shift){
                   }
 
             var temp_object = draw_note (note_list[i], currentX, y_shift);
-            console.log(note_list[i]);
-            console.log(temp_object);
+            //console.log(note_list[i]);
+            //console.log(temp_object);
             temp_svgContent =temp_object.svgContent;
             currentX = temp_object.currentX;
 
@@ -389,7 +396,7 @@ function draw_the_hover_box(x_shift, y_shift,current_time){
 }
 
 function move_the_hover_box(x_shift, y_shift,current_time){
-
+    
     var the_hover = document.getElementById("the_hover");
     var currentX = x_shift + current_time*unit_shift-unit_shift/4;
     var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
@@ -545,7 +552,7 @@ function draw_half_note (note, currentX, y_shift){
     }
     currentX += unit_shift*2;
 
-    console.log(svgContent);
+    //console.log(svgContent);
 
     return {svgContent, currentX};
 }
@@ -674,6 +681,9 @@ function draw_bar(note_list, x_shift, y_shift) {
             console.log("new line");
         }
 
+        note_list[i].y_pos = y_shift;
+        note_list[i].x_pos = currentX;
+
         var temp_object = draw_note (note_list[i], currentX, y_shift);
         console.log(note_list[i]);
         console.log(temp_object);
@@ -686,8 +696,6 @@ function draw_bar(note_list, x_shift, y_shift) {
 
          
     }
-
-
 
     return svgContent;
 }
@@ -759,7 +767,7 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
 
     var note = abcNote.pitches[0].pitch;
     var octave = 3;
-    var connection = false;
+    var connection = {"is_connected":false};
     if (note < 0){
         note+= 7;
         octave -= 1;
@@ -778,6 +786,17 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
     if (abcNote.endBeam){
         console.log("actual end beam")
         symbol = "end_beam";
+    }
+
+
+    if (abcNote.pitches[0].startSlur){
+        console.log(abcNote.pitches[0].startSlur[0].label);
+        connection = {"is_connected":true, "start": true,"slur_id":abcNote.pitches[0].startSlur[0].label};
+    }
+
+    if (abcNote.pitches[0].endSlur){
+        connection = {"is_connected":true, "end": true,"slur_id":abcNote.pitches[0].endSlur[0]};
+
     }
 
 
@@ -842,7 +861,9 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         duration: duration,
         bar_number: bar_number,
         connection: connection,
-        symbol: null
+        symbol: null,
+        x_pos: -1,
+        y_pos: -1
     };
 }
 
@@ -853,7 +874,9 @@ var test_node = {
     "duration": 2,
     "bar_number": 1,
     "connection": null,
-    "symbol": null
+    "symbol": null,
+    "x_pos": -1,
+    "y_pos": -1
 };
 
 
