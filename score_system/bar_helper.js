@@ -12,7 +12,7 @@ var abc = "T: 月光下的凤尾竹\n" +
 "L: 1/8\n" +
 "K:G\n" +
 "Q:1/4=88\n" +
-"(CuA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (~DC)|(C6|C6)|]";
+"(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
 
 
 
@@ -61,6 +61,15 @@ function abcToNoteList(abc){
     var all_notes_og_abc = parse_notes_og_abc(all_notes);
 
     return all_notes_og_abc;
+}
+
+function abcToBarList(abc){
+    var notes = getNotes(abc,0);
+
+    var all_bars = getAllBars(notes);
+    console.log(all_bars);
+
+    return all_bars;
 }
 
 
@@ -122,18 +131,6 @@ function getNotes(abc,staff_index){
     return all_voices;
 }
 
-// write a function to translate the abc notation to the note list format we are using here
-function abcToNoteList(abc){
-    var notes = getNotes(abc,0);
-
-    var all_notes = splitArrayByBarType(notes);
-    console.log(all_notes);
-
-    // do parse_notes_og_abc
-    var all_notes_og_abc = parse_notes_og_abc(all_notes);
-
-    return all_notes_og_abc;
-}
 
 
 function getAllVoices(abc,staff_index) {
@@ -183,6 +180,9 @@ function draw_score(abc_notation,x_shift, y_shift){
     //var note_list = parse_notes(abc_notation);
     var note_list = abcToNoteList(abc_notation);
 
+    var bar_list = abcToBarList(abc_notation);
+    console.log(bar_list);
+
         // Add event listener to the button
     document.getElementById('sendWebStartButton').addEventListener('click', startMS);
     document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
@@ -205,12 +205,13 @@ function draw_score(abc_notation,x_shift, y_shift){
     var total_bar_count = Math.floor(note_list[note_list.length-1].bar_number/horizontal_bar_count);
     console.log("total bar count" + total_bar_count);
 
+
     
 
 
     total_svgContent += draw_bar(note_list, x_shift, y_shift);
 
-    total_svgContent += draw_base(note_list, x_shift, y_shift);
+    total_svgContent += draw_base(note_list, x_shift, y_shift,bar_list);
 
     total_svgContent += draw_beam(note_list, x_shift, y_shift);
 
@@ -316,7 +317,7 @@ function draw_slur(note_list, x_shift, y_shift) {
         //     console.log("new line");
         // }
 
-        var beamY = y_shift - unit_shift/6*2.5 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+        var beamY = y_shift - unit_shift/6*3 + Math.floor(x_shift/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
         var beamX = x_shift% (unit_shift*6*horizontal_bar_count);
 
 
@@ -362,7 +363,7 @@ function draw_slur(note_list, x_shift, y_shift) {
 }
 
 
-function draw_base(note_list,x_shift, y_shift){
+function draw_base(note_list,x_shift, y_shift,bar_list){
     
 
     // Initial setup for the SVG content
@@ -375,9 +376,6 @@ function draw_base(note_list,x_shift, y_shift){
     // draw notes
     // loop through the note list
     for(let i = 0; i < note_list.length; i++){
-
-
-
 
         // draw the note
         if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
@@ -395,6 +393,32 @@ function draw_base(note_list,x_shift, y_shift){
             // draw a line to separate the bars
             svgContent += `<line x1="${currentX-unit_shift/2}" y1="${y_shift-unit_shift/2}" x2="${currentX-unit_shift/2}" y2="${y_shift+vertical_unit_shift/2-unit_shift/2}" stroke="black" stroke-width="1.5"/>`;
             curr_bar_number = note_list[i].bar_number;
+            reference_bar_number = note_list[i].bar_number-1;
+
+            if (bar_list[reference_bar_number].decoration){
+                // iterate through the decorations
+                for (let j = 0; j < bar_list[reference_bar_number].decoration.length; j++){
+                    if (bar_list[reference_bar_number].decoration[j] === "upbow"){
+                        var temp_y_shift = y_shift- unit_shift/6*4;
+                        //svgContent += `<text x="${currentX-unit_shift/6*5}" y="${temp_y_shift}" class="small">v</text>`;
+                        // use two lines to draw the upbow instead of the text 
+                        // draw a line which rotates 45 degrees, the right part is up
+                        // Calculate the new starting X position
+                        let start_x = currentX - unit_shift / 2-unit_shift/6;
+                        let scale_unit = 0.1 * unit_shift;
+                        // Adjusted lines to ensure the pattern is centered
+                        // Continue with the adjusted pattern
+                        svgContent += `<line x1="${start_x - scale_unit * 1 }" y1="${temp_y_shift-scale_unit*2}" x2="${start_x}" y2="${temp_y_shift}" stroke="black" stroke-width="1"/>`;
+                        svgContent += `<line x1="${start_x}" y1="${temp_y_shift}" x2="${start_x + scale_unit * 1}" y2="${temp_y_shift - scale_unit * 2}" stroke="black" stroke-width="1"/>`;
+                    }
+                }
+     
+
+            }
+
+            console.log("current bar drawing ", bar_list[reference_bar_number]);
+
+
             }
 
             if (note_list[i].bar_number !== previous_bar_number && note_list[i].bar_number%horizontal_bar_count== 0){
@@ -472,7 +496,7 @@ function move_the_hover_box(x_shift, y_shift,current_time){
     the_hover.setAttribute("x", currentX);
     the_hover.setAttribute("y", currentY);
 
-
+    //draw_slur
 
 
 }
@@ -483,6 +507,7 @@ function move_the_hover_box(x_shift, y_shift,current_time){
 function splitArrayByBarType(data) {
     const result = [];
     let currentGroup = [];
+    const bar_list = [];
 
     data.forEach(item => {
         // Check if the item has a 'type' key and includes 'bar' in its value
@@ -493,6 +518,7 @@ function splitArrayByBarType(data) {
                 result.push(currentGroup);
                 currentGroup = [];
             }
+            bar_list.push(item);
             // Optionally, include the bar element itself into the result as a separate group
             // Uncomment the next line if you want each bar element to be in its own group
             // result.push([item]);
@@ -507,8 +533,43 @@ function splitArrayByBarType(data) {
         result.push(currentGroup);
     }
 
-    return result;
+    return result
 }
+
+
+
+function getAllBars(data) {
+    const result = [];
+    let currentGroup = [];
+    const bar_list = [];
+
+    data.forEach(item => {
+        // Check if the item has a 'type' key and includes 'bar' in its value
+        if (item.type && item.type.includes('bar')) {
+            // When a bar is found, push the current group to the result
+            // and start a new group only if the current group is not empty
+            if (currentGroup.length > 0) {
+                result.push(currentGroup);
+                currentGroup = [];
+            }
+            bar_list.push(item);
+            // Optionally, include the bar element itself into the result as a separate group
+            // Uncomment the next line if you want each bar element to be in its own group
+            // result.push([item]);
+        } else {
+            // Add the item to the current group
+            currentGroup.push(item);
+        }
+    });
+
+    // After the loop, add any remaining items as the last group
+    if (currentGroup.length > 0) {
+        result.push(currentGroup);
+    }
+
+    return bar_list;
+}
+
 
 
 
@@ -685,6 +746,31 @@ function draw_note (note, x_shift, y_shift){
                 var temp_y_shift = y_shift- unit_shift/6*4;
                 temp_svgContent = `<text x="${x_shift-unit_shift/4}" y="${temp_y_shift}" class="small">v</text>`;
             }
+
+            if (note.decorations[i] === "pralltriller"){
+                var temp_y_shift = y_shift- unit_shift/6*1.8;
+                var scale_unit = 0.2*unit_shift;
+                // draw a line which rotates 45 degree, the right part is up
+            // draw a line which rotates 45 degrees, the right part is up
+                // draw a line which rotates 45 degrees, the right part is up
+                // Calculate the new starting X position
+                let start_x = x_shift - scale_unit * 1.25;
+
+                // Adjusted lines to ensure the pattern is centered
+                temp_svgContent = `<line x1="${start_x}" y1="${temp_y_shift}" x2="${start_x + scale_unit * 1 / 2}" y2="${temp_y_shift - scale_unit * 1 / 2}" stroke="black" stroke-width="1"/>`;
+
+                // Continue with the adjusted pattern
+                temp_svgContent += `<line x1="${start_x + scale_unit * 1 / 2}" y1="${temp_y_shift - scale_unit * 1 / 2}" x2="${start_x + scale_unit * 1}" y2="${temp_y_shift}" stroke="black" stroke-width="4"/>`;
+
+                temp_svgContent += `<line x1="${start_x + scale_unit * 1}" y1="${temp_y_shift}" x2="${start_x + scale_unit * 1.5}" y2="${temp_y_shift - scale_unit * 1 / 2}" stroke="black" stroke-width="1"/>`;
+
+                temp_svgContent += `<line x1="${start_x + scale_unit * 1.5}" y1="${temp_y_shift - scale_unit * 1 / 2}" x2="${start_x + scale_unit * 2}" y2="${temp_y_shift}" stroke="black" stroke-width="4"/>`;
+
+                temp_svgContent += `<line x1="${start_x + scale_unit * 2}" y1="${temp_y_shift}" x2="${start_x + scale_unit * 2.5}" y2="${temp_y_shift - scale_unit * 1 / 2}" stroke="black" stroke-width="1"/>`;
+
+            }
+
+
         }
     }
 
@@ -875,60 +961,6 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
 }
 
 
-  function parseNoteToMyNotation(abcNote, bar_number) {
-    console.log(abcNote);
-    // Define a mapping for notes to numbers
-    const noteMapping ={
-        "Z": 0,
-        "C": 1,
-        "D": 2,
-        "E": 3,
-        "F": 4,
-        "G": 5,
-        "A": 6,
-        "B": 7
-    };
-
-    // Initial values
-    let noteValue = null;
-    let octave = 4; // Default octave
-    let duration = 1; // Default duration
-    let connection = false;
-
-    // check whether the note has "(", if so, mark the connection has true
-    if (abcNote.includes("(")){
-        connection = true;
-    }
-
-    // Extract the note, check for octave indicators (',') and duration
-    for (let i = 0; i < abcNote.length; i++) {
-        const char = abcNote[i].toUpperCase();
-        if (noteMapping.hasOwnProperty(char)) {
-            noteValue = noteMapping[char];
-            // Adjust octave based on case of the letter
-            octave += abcNote[i] === abcNote[i].toLowerCase() ? 0 : -1;
-        } else if (char === ',') {
-            octave--; // Lower octave for each comma
-        } else if (!isNaN(parseInt(char))) {
-            duration = parseInt(abcNote.substring(i)); // Assumes rest are duration
-            break; // Exit loop once duration is found
-        }
-    }
-
-
-    return {
-        note: noteValue,
-        octave: octave,
-        y_bar_shift: Math.floor(bar_number/horizontal_bar_count),
-        duration: duration,
-        bar_number: bar_number,
-        connection: connection,
-        symbol: null,
-        x_pos: -1,
-        y_pos: -1,
-        decorations: []
-    };
-}
 
 
 var test_node = {
