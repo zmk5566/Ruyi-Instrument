@@ -10,6 +10,8 @@ var websocket;
 var abc = "T: 月光下的凤尾竹\n" +
 "M: 3/4\n" +
 "L: 1/8\n" +
+"C:施光南曲\n"+
+"C:周成龙编曲\n"+
 "K:G\n" +
 "Q:1/4=88\n" +
 "(CA,) (A,C) {A,}C2|(CD) (DE) {AB,C}E2|(ED) ({AC}DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
@@ -52,11 +54,12 @@ function getGeneralInfo(abc){
     var title = parsed[0].metaText.title;
     var key = parsed[0].lines[0].staff[0].key.root;
     var time_signature = parsed[0].lines[0].staff[0].meter.value[0];
-    console.log(time_signature);
+    var composer = parsed[0].metaText.composer;
+    console.log(parsed[0].metaText);
 
 
 
-    return {"title":title,"key":key,"time_signature":time_signature,"bpm":bpm};
+    return {"title":title,"key":key,"time_signature":time_signature,"bpm":bpm,"composer":composer};
 
 
 

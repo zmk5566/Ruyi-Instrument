@@ -63,6 +63,35 @@
             text-align: left;
             margin-left: 10px;
         }
+
+        #right-score {
+            text-align: right;
+            margin-right: 10px;
+        }
+        #meta_data {
+        display: flex; /* Enables flex context for direct children */
+        justify-content: space-between; /* Spaces out children evenly */
+        align-items: center; /* Vertically aligns items if they're of different heights */
+        padding: 5px; /* Adds some spacing inside the container */
+    }
+
+        #left-score, #right-score {
+            /* Apply necessary styling here.
+            For example, ensure text doesn't exceed its portion of the container: */
+            width: 49%; /* Slightly less than half the container's width to fit side by side */
+        }
+
+        #left-score a, #right-score div {
+            /* Example styling for links and divs to improve legibility/visibility */
+            color: #000; /* Sets the text color */
+            text-decoration: none; /* Removes underline from links */
+        }
+        
+        /* To prevent links from being too close to each other */
+        #left-score a {
+            margin-right: 5px; /* Adjust as needed */
+        }
+
     </style>
 </head>
 <body>
@@ -70,14 +99,26 @@
 
 
 <div id="score">
-<h3>月光下的牛蓝山二锅头</h3>
+<h3 id="title">-</h3>
 <div id="svgContainer">
-<div id="left-score">1=G, 3/4</div>
-<div id="svgSpecific">
+<div id="meta_data">
+<div id="left-score">1=<a id="key"> </a>, <a id="num"></a>/ <a id="den"></a>
+
+    <div>BPM:  <a id=bpm>-</a></div>
 
 
 </div>
+<div id="right-score">
 
+<div id="composer"></div>
+</div>
+    
+
+
+</div>
+<div id="svgSpecific">
+
+</div>
 </div>
 </div>
 
@@ -124,13 +165,20 @@ function drawSVG() {
         abcNotation = abc;
     } else if (choice === "2") {
         abcNotation = abc;
-}
+    }
 
 
 
 
     //const svgOutput = parse_notes(abcNotation); // Assuming no shift is needed for this example
     const svgOutput = draw_score(abcNotation,20,40);
+    var meta_data  = getGeneralInfo(abcNotation);
+    document.getElementById('title').innerHTML = meta_data.title;
+    document.getElementById('key').innerHTML = meta_data.key;
+    document.getElementById('bpm').innerHTML = meta_data.bpm;
+    document.getElementById('num').innerHTML = meta_data.time_signature.num;
+    document.getElementById('den').innerHTML = meta_data.time_signature.den;
+    document.getElementById('composer').innerHTML = meta_data.composer;
 
     console.log(getGeneralInfo(abcNotation));
     //console.log(svgOutput);
