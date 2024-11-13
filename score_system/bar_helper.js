@@ -12,7 +12,7 @@ var abc = "T: 月光下的凤尾竹\n" +
 "L: 1/8\n" +
 "K:G\n" +
 "Q:1/4=88\n" +
-"(CA,) (A,C) {A,}C2|(CD) (DE) {ABC}E2|(ED) ({AC}DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
+"(CA,) (A,C) {A,}C2|(CD) (DE) {AB,C}E2|(ED) ({AC}DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
 
 
 
@@ -43,6 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+function getGeneralInfo(abc){
+
+    var parsed = ABCJS.parseOnly(abc);
+
+    console.log(parsed[0].metaText.tempo.bpm);
+    var bpm = parsed[0].metaText.tempo.bpm;
+    var title = parsed[0].metaText.title;
+    var key = parsed[0].lines[0].staff[0].key.root;
+    var time_signature = parsed[0].lines[0].staff[0].meter.value[0];
+    console.log(time_signature);
+
+
+
+    return {"title":title,"key":key,"time_signature":time_signature,"bpm":bpm};
+
+
+
+
+
+}
 function getNotes(abc,staff_index){
     var staff_index = 0;
     var all_voices = getAllVoices(abc,staff_index);
@@ -783,10 +803,12 @@ function draw_note (note, x_shift, y_shift){
                 // draw a line but instead of move 10, move in proportion to the unit_shift
                 console.log("vereeeery simple duration");
                 //DRAW A LINE BENEEATH THE GRACE NOTE
-                temp_svgContent += `<line x1="${the_gracenote_x -the_temp_shift/2}" y1="${temp_y_shift + the_temp_shift}" x2="${the_gracenote_x +the_temp_shift/2
+                temp_svgContent += `<line x1="${the_gracenote_x -the_temp_shift/2}" y1="${temp_y_shift + the_temp_shift*0.8}" x2="${the_gracenote_x +the_temp_shift/2}" y2="${temp_y_shift + the_temp_shift*0.8}" stroke="black"/> stroke-width="0.8"`;
+                // if total_gracenote_length >1, then draw another line beneath the gracenote
                 
-                 }" y2="${temp_y_shift + the_temp_shift}" stroke="black"/> stroke-width="1"`;
-              //  }
+                if (total_gracenote_length >1){
+                temp_svgContent += `<line x1="${the_gracenote_x -the_temp_shift/2}" y1="${temp_y_shift + the_temp_shift*1.2}" x2="${the_gracenote_x +the_temp_shift/2}" y2="${temp_y_shift + the_temp_shift*1.2}" stroke="black"/> stroke-width="0.8"`;
+                }
 
             // check if the gracenote octave is 3, then draw a circle
             if (note.gracenotes[i].octave === 2) {

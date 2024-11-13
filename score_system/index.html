@@ -131,6 +131,8 @@ function drawSVG() {
 
     //const svgOutput = parse_notes(abcNotation); // Assuming no shift is needed for this example
     const svgOutput = draw_score(abcNotation,20,40);
+
+    console.log(getGeneralInfo(abcNotation));
     //console.log(svgOutput);
     document.getElementById('svgSpecific').innerHTML = svgOutput;
 }
