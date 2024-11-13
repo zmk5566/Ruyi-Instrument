@@ -12,7 +12,7 @@ var abc = "T: 月光下的凤尾竹\n" +
 "L: 1/8\n" +
 "K:G\n" +
 "Q:1/4=88\n" +
-"(CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
+"(CA,) (A,C) {A,}C2|(CD) (DE) {ABC}E2|(ED) ({AC}DC) (CA,)|(C4 DC)|(A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|(E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|(C6|C6)|]";
 
 
 
@@ -187,7 +187,7 @@ function draw_score(abc_notation,x_shift, y_shift){
     document.getElementById('sendWebStartButton').addEventListener('click', startMS);
     document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
     
-    var total_svgContent = `<svg width="1400" height="600" xmlns="http://www.w3.org/2000/svg">
+    var total_svgContent = `<svg width="740" height="500" xmlns="http://www.w3.org/2000/svg">
     <style>
     text {
       font-size: 20px;
@@ -729,7 +729,33 @@ function draw_double_whole_note (note,decoration_svg, currentX, y_shift){
     return {svgContent, currentX};
 }
 
-
+function createCurvedCornerSvg(startX, startY, width, height) {
+    // Calculate the actual starting points of the path
+    const pathStartX = startX;
+    const pathStartY = startY - height / 2;
+  
+    // Control point for the quadratic Bezier curve
+    const controlX = pathStartX;
+    const controlY = startY;
+  
+    // End point of the curve
+    const endX = startX + width / 2;
+    const endY = startY ;
+  
+    // Assemble the SVG path data
+    const pathData = `M${pathStartX},${pathStartY} Q${controlX},${controlY} ${endX},${endY}`;
+  
+    // Create the path element
+    const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathElement.setAttribute("d", pathData);
+    pathElement.setAttribute("stroke", "black");
+    pathElement.setAttribute("stroke-width", "0.8");
+    pathElement.setAttribute("fill", "none");
+  
+    // return the string version of the path element
+    return pathElement.outerHTML;
+  }
+  
 
 function draw_note (note, x_shift, y_shift){
 
@@ -738,6 +764,45 @@ function draw_note (note, x_shift, y_shift){
     var y_shift = y_shift;
 
     var temp_svgContent = "";
+
+    if (note.gracenotes){
+        console.log ("gracenotes", note.gracenotes.length);
+        var the_temp_shift = unit_shift/6;
+        var total_width_grade_notes = note.gracenotes.length*the_temp_shift*2.5;
+
+        var total_gracenote_length  = note.gracenotes.length;
+
+        for (let i = 0; i < note.gracenotes.length; i++){
+            var temp_y_shift = y_shift- unit_shift/6*3;
+            var the_gracenote_x = x_shift - total_width_grade_notes/2+the_temp_shift*i;
+    
+            temp_svgContent += `<text x="${the_gracenote_x}" y="${temp_y_shift}" class="gracenotes">${note.gracenotes[i].note}</text>`;
+        
+            // check the duration of the gracenote, if it is 1, then draw a line
+            //if (note.gracenotes[i].simple_duration === 1){
+                // draw a line but instead of move 10, move in proportion to the unit_shift
+                console.log("vereeeery simple duration");
+                //DRAW A LINE BENEEATH THE GRACE NOTE
+                temp_svgContent += `<line x1="${the_gracenote_x -the_temp_shift/2}" y1="${temp_y_shift + the_temp_shift}" x2="${the_gracenote_x +the_temp_shift/2
+                
+                 }" y2="${temp_y_shift + the_temp_shift}" stroke="black"/> stroke-width="1"`;
+              //  }
+
+            // check if the gracenote octave is 3, then draw a circle
+            if (note.gracenotes[i].octave === 2) {
+                temp_svgContent += `<circle r="1" cx="${the_gracenote_x}" cy="${temp_y_shift + the_temp_shift*1.5}" fill="black" />`;
+            }
+
+            //x_shift += unit_shift
+        }
+                    // let's add the gracenote 
+       temp_svgContent+= createCurvedCornerSvg( x_shift - total_width_grade_notes/2+the_temp_shift*(total_gracenote_length-1), temp_y_shift + unit_shift/6*2.5, the_temp_shift, the_temp_shift*1.2);
+
+        
+    }
+
+
+
 
     // draw the decorations
     if (note.decorations){
@@ -845,13 +910,6 @@ function draw_bar(note_list, x_shift, y_shift) {
     return svgContent;
 }
 
-// // Example usage:
-// const abcNotation = "(CA,) (A,C) C2|(CD) (DE) E2";
-// const xShift = 0;
-// const yShift = 0;
-// const test_out = parse_notes(abcNotation);
-// //const svgOutput = draw_bar(abcNotation, xShift, yShift);
-// console.log(test_out);
 
 
 
@@ -900,6 +958,7 @@ function splitNotes(input) {
 //     "startBeam": true
 // }
 
+
 function parseAbcNoteToMyNotation(abcNote, bar_number) {
     // Define a mapping for notes to numbers
     //console.log(abcNote);
@@ -917,6 +976,30 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         note+= 7;
         octave -= 1;
     }
+
+    // iterate through all the gracenotes in abcNote.gracenotes
+    if (abcNote.gracenotes){
+    for (let i = 0; i < abcNote.gracenotes.length; i++){
+
+        var grace_note = abcNote.gracenotes[i].pitch;
+        var grace_octave = 3;
+        if (grace_note < 0){
+            grace_note += 7;
+            grace_octave -= 1;
+        }
+
+        abcNote.gracenotes[i].note = grace_note+1;
+        abcNote.gracenotes[i].octave = grace_octave;
+        abcNote.gracenotes[i].simple_duration = parseInt(abcNote.gracenotes[i].duration/0.125);
+
+
+        //console.log(abcNote.gracenotes[i].pitch);
+        //console.log(abcNote.gracenotes[i].duration);
+    }
+}
+
+
+    
 
     //console.log("current pitch");
     //console.log(abcNote.pitches[0].pitch);
@@ -955,6 +1038,7 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         x_pos: -1,
         y_pos: -1,
         decorations: abcNote.decoration,
+        gracenotes: abcNote.gracenotes,
         symbol: symbol
     };
 
@@ -972,7 +1056,8 @@ var test_node = {
     "symbol": null,
     "x_pos": -1,
     "y_pos": -1,
-    "decorations": []
+    "decorations": [],
+    "gracenotes": []
 };
 
 
