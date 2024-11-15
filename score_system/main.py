@@ -1,61 +1,63 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from typing import List, Dict
 import os
+import aiofiles.os
 
 app = FastAPI()
 
-# Serve the "../static" folder.
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+# Define your static directory
+static_dir = "static"
 
-# Serve the "../../scroll" folder.
-app.mount("/scroll", StaticFiles(directory="../scrolls/"), name="scroll")
+# Optionally, mount the static directory at a specific path for direct access
+# This line can be adjusted or removed based on your preferences
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-def list_files_with_extension_in_directory(directory_path: str, extension: str) -> List[Dict]:
-    print(f"Listing files with extension '{extension}' in directory '{directory_path}'")
-    """
-    Lists all files with a given extension within a directory and its subdirectories.
+
+@app.middleware("http")
+async def serve_static_files(request: Request, call_next):
+    # Construct the path to the file within the static directory
+    file_path = os.path.join(static_dir, request.url.path.strip("/"))
     
-    :param directory_path: The path to the directory to scan.
-    :param extension: The file extension to filter by.
-    :return: A list of dictionaries containing folder names and their respective files with the specified extension.
-    """
-    result = []
-    for root, dirs, files in os.walk(directory_path):
-        filtered_files = [file for file in files if file.endswith(extension)]
-        if filtered_files:
-            # Format the root to show a relative path from the directory_path
-            formatted_root = os.path.relpath(root, directory_path)
-            result.append({"folder": formatted_root, "files": filtered_files})
-    return result
-
-@app.get("/list-folders/", response_model=List[Dict])
-async def list_folders_with_abc_files(directory: str):
-    """
-    Endpoint to list folders and '.abc' files within a specified directory.
+    # Check if the file exists and is not a directory
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
     
-    :param directory: Query parameter specifying the base directory to search within.
-    :return: JSON response with folders and their '.abc' files.
-    """
-    if not os.path.isdir(directory):
-        raise HTTPException(status_code=404, detail="Directory not found")
-    
-    return list_files_with_extension_in_directory(directory, ".abc")
+    # If no file is matched, proceed with the next middleware or route
+    response = await call_next(request)
+    return response
+
+#create a resful style api to list all the files in the ../scroll directory
+@app.get("/scroll/")
+async def list_scrolls():
+    # List all files in the ../scroll directory
+    scroll_dir = "../scrolls"
+    scroll_files = os.listdir(scroll_dir)
+    # filter out any non-folder files
+    scroll_files = [file for file in scroll_files if os.path.isdir(os.path.join(scroll_dir, file))]
+    # iterate through all the scroll files, use the list_scroll function to return the files in each folder,make a dictionary with the scroll name and the files in the folder
+    scroll_files = {scroll: list_scroll_safe(scroll) for scroll in scroll_files}
+    return {"scrolls": scroll_files}
 
 
-# write a function list all the folder names in the /scrolls directory
-@app.get("/scroll/", response_model=List[str])
-def list_folders_in_directory(directory_path: str) -> List[str]:
-    print(f"Listing folders in directory '{directory_path}'")
-    """
-    Lists all folders within a directory.
-    
-    :param directory_path: The path to the directory to scan.
-    :return: A list of folder names.
-    """
-    return [folder for folder in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, folder))]
+# restful style enter the scroll name and return all the files with the extension .abc
+@app.get("/scroll/{scroll_name}")
+async def list_scroll(scroll_name: str):
+    # List all files with the .abc extension in the specified scroll directory
+    scroll_dir = f"../scrolls/{scroll_name}"
+    scroll_files = os.listdir(scroll_dir)
+    scroll_files = [file for file in scroll_files if file.endswith(".abc")]
+    return {"scroll": scroll_name, "files": scroll_files}
+
+def list_scroll_safe(scroll_name: str):
+    # List all files with the .abc extension in the specified scroll directory
+    scroll_dir = f"../scrolls/{scroll_name}"
+    scroll_files = os.listdir(scroll_dir)
+    scroll_files = [file for file in scroll_files if file.endswith(".abc")]
+    return scroll_files
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+@app.get("/current/")
+async def current_directory():
+    # Example API route
+    return {"message": "This is the /current/ endpoint."}
