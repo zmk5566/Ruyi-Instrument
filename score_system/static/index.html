@@ -116,6 +116,12 @@ function load_all_configs(){
 function generate_interface(input_json){
     // clear the previous interface
     document.getElementById('choices').innerHTML = "";
+    // add a dummy option with no value
+    var option = document.createElement('option');
+    option.value = "";
+    option.innerHTML = "--请选择--";
+    document.getElementById('choices').appendChild(option);
+
     document.getElementById('choice-parts').innerHTML = "";
     // iterate through the key scrolls
     // for each key scroll, create a new div
