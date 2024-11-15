@@ -1,0 +1,74 @@
+#svgContainer {
+    border: 1px solid #ccc;
+    width: 740px;
+    margin:auto;
+
+}
+#svgSpecific{
+    width: 100%;
+    height: 100%;
+}
+.gracenotes{
+    font-size: 12px;
+}
+    /* This will apply to all direct children of #control_pannel */
+#control_pannel > * {
+    margin: 10px auto; /* Adjust '10px' to control the vertical spacing */
+    display: block;
+    width: 90%; /* Adjust the percentage as per requirement */
+    text-align: center; /* Center text for text-based elements */
+}
+
+#control_pannel select, #control_pannel button {
+    padding: 10px; /* Adjust padding for better appearance */
+}
+
+#control_pannel {
+    text-align: center; /* Ensures the inline elements (like buttons) are also centered */
+}
+
+#score {
+text-align: center; /* Centers the content of #score, including <h3> */
+padding: 20px; /* Adds some space inside the #score div around its content */
+border: 2px solid #000; /* Example border to visualize the "box" */
+margin: auto; /* Centers the #score div if it has a set width */
+width: 90%; /* Adjust based on your design needs */
+}
+
+#score h3 {
+    margin: 0 auto; /* Removes default margin from <h3> and centers it */
+    padding: 10px 0; /* Adds some padding above and below the <h3> text */
+}
+
+#left-score {
+    text-align: left;
+    margin-left: 10px;
+}
+
+#right-score {
+    text-align: right;
+    margin-right: 10px;
+}
+#meta_data {
+display: flex; /* Enables flex context for direct children */
+justify-content: space-between; /* Spaces out children evenly */
+align-items: center; /* Vertically aligns items if they're of different heights */
+padding: 5px; /* Adds some spacing inside the container */
+}
+
+#left-score, #right-score {
+    /* Apply necessary styling here.
+    For example, ensure text doesn't exceed its portion of the container: */
+    width: 49%; /* Slightly less than half the container's width to fit side by side */
+}
+
+#left-score a, #right-score div {
+    /* Example styling for links and divs to improve legibility/visibility */
+    color: #000; /* Sets the text color */
+    text-decoration: none; /* Removes underline from links */
+}
+
+/* To prevent links from being too close to each other */
+#left-score a {
+    margin-right: 5px; /* Adjust as needed */
+}

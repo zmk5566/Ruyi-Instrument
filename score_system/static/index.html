@@ -3,96 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- load style.css -->
+    <link rel="stylesheet" href="css/style.css">
     <title>ABC Notation to SVG</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="dist/abcjs-basic.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="js/Tone.js"></script>
     <script src="bar_helper.js"></script>
     <script>
+
     // trigger the drawSVG(1) function when the page loads
+
     window.onload = function() {
-        drawSVG();
+
+    // add a listener to the choices select element
+    document.getElementById('choices').addEventListener('change', function(){
+        // get the value of the selected option
+        var selection_name = this.value;
+        // trigger the triggerSelection function
+        triggerSelection(selection_name);
+    });
+
+
+
+        //drawSVG();
+        load_all_configs();
     };
      
+
     </script>
-
-    <style>
-        #svgContainer {
-            border: 1px solid #ccc;
-            width: 740px;
-            margin:auto;
-
-        }
-        #svgSpecific{
-            width: 100%;
-            height: 100%;
-        }
-        .gracenotes{
-            font-size: 12px;
-        }
-            /* This will apply to all direct children of #control_pannel */
-        #control_pannel > * {
-            margin: 10px auto; /* Adjust '10px' to control the vertical spacing */
-            display: block;
-            width: 90%; /* Adjust the percentage as per requirement */
-            text-align: center; /* Center text for text-based elements */
-        }
-        
-        #control_pannel select, #control_pannel button {
-            padding: 10px; /* Adjust padding for better appearance */
-        }
-        
-        #control_pannel {
-            text-align: center; /* Ensures the inline elements (like buttons) are also centered */
-        }
-
-        #score {
-        text-align: center; /* Centers the content of #score, including <h3> */
-        padding: 20px; /* Adds some space inside the #score div around its content */
-        border: 2px solid #000; /* Example border to visualize the "box" */
-        margin: auto; /* Centers the #score div if it has a set width */
-        width: 90%; /* Adjust based on your design needs */
-        }
-
-        #score h3 {
-            margin: 0 auto; /* Removes default margin from <h3> and centers it */
-            padding: 10px 0; /* Adds some padding above and below the <h3> text */
-        }
-
-        #left-score {
-            text-align: left;
-            margin-left: 10px;
-        }
-
-        #right-score {
-            text-align: right;
-            margin-right: 10px;
-        }
-        #meta_data {
-        display: flex; /* Enables flex context for direct children */
-        justify-content: space-between; /* Spaces out children evenly */
-        align-items: center; /* Vertically aligns items if they're of different heights */
-        padding: 5px; /* Adds some spacing inside the container */
-    }
-
-        #left-score, #right-score {
-            /* Apply necessary styling here.
-            For example, ensure text doesn't exceed its portion of the container: */
-            width: 49%; /* Slightly less than half the container's width to fit side by side */
-        }
-
-        #left-score a, #right-score div {
-            /* Example styling for links and divs to improve legibility/visibility */
-            color: #000; /* Sets the text color */
-            text-decoration: none; /* Removes underline from links */
-        }
-        
-        /* To prevent links from being too close to each other */
-        #left-score a {
-            margin-right: 5px; /* Adjust as needed */
-        }
-
-    </style>
 </head>
 <body>
 
@@ -126,9 +66,9 @@
 <div id="control_pannel">
     <div id="choose_score">
      <select id="choices">
-         <option value="1">月光下（声部一）</option>
-         <option value="2">月光下（声部二）</option>
      </select>
+     <select id="choice-parts">
+    </select>
     </div>
 
     <!-- Button container to group buttons in one line -->
@@ -150,8 +90,71 @@
 
 
 
+function load_all_configs(){
+    // Load all
+    // peform an AJAX call to load all possibile configurations
+    // it looks something like {"scrolls":[{"name":"茉莉花","abc_scrolls":["1.abc","2.abc","3.abc"]},{"name":"月光下的凤尾竹","abc_scrolls":["1.abc","2.abc"]}]}
+    // when it sucess, trigger the generate inferface function
+    // when it fails, show an error message
+    $.ajax({
+        url: '/scroll',
+        type: 'GET',
+        success: function(response){
+            console.log(response);
+            generate_interface(response);
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+    
+    
 
+}
 
+// a json would look like this: {"scrolls":[{"name":"茉莉花","abc_scrolls":["1.abc","2.abc","3.abc"]},{"name":"月光下的凤尾竹","abc_scrolls":["1.abc","2.abc"]}]}
+function generate_interface(input_json){
+    // clear the previous interface
+    document.getElementById('choices').innerHTML = "";
+    document.getElementById('choice-parts').innerHTML = "";
+    // iterate through the key scrolls
+    // for each key scroll, create a new div
+    // add the name of the scroll to the div
+    input_json.scrolls.forEach(element => {
+        // create a new option element
+        var option = document.createElement('option');
+        option.value = element.name;
+        option.innerHTML = element.name;
+        document.getElementById('choices').appendChild(option);
+        // now do a ajax call to get the parts
+        console.log(element);
+        
+    });
+}
+
+function triggerSelection(selection_name){
+    $.ajax({
+            url: '/scroll/' + selection_name,
+            type: 'GET',
+            success: function(response){
+                // clear the previous interface
+                document.getElementById('choice-parts').innerHTML = "";
+                console.log(response);
+                // iterate through the parts
+                response.parts.forEach(part => {
+                    // create a new option element
+                    var option = document.createElement('option');
+                    option.value = part;
+                    option.innerHTML = part;
+                    document.getElementById('choice-parts').appendChild(option);
+                });
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    
+}
 
 
 

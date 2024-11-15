@@ -48,7 +48,7 @@ async def list_scroll(scroll_name: str):
     scroll_files = os.listdir(scroll_dir)
     scroll_files = [file for file in scroll_files if file.endswith(".abc")]
     # reform the object so it would look like {"name": "scroll_name", "files": ["file1.abc", "file2.abc"]}
-    return {"scroll": scroll_name, "files": scroll_files}
+    return {"scroll": scroll_name, "parts": scroll_files}
 
 def list_scroll_safe(scroll_name: str):
     # List all files with the .abc extension in the specified scroll directory
@@ -56,7 +56,7 @@ def list_scroll_safe(scroll_name: str):
     scroll_files = os.listdir(scroll_dir)
     scroll_files = [file for file in scroll_files if file.endswith(".abc")]
     # reform the object so it would look like {"name": "scroll_name", "files": ["file1.abc", "file2.abc"]}
-    scroll_files = {"name": scroll_name, "abc_scrolls": scroll_files}
+    scroll_files = {"name": scroll_name, "parts": scroll_files}
     return scroll_files
 
 
