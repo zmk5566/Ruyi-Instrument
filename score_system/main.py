@@ -35,8 +35,8 @@ async def list_scrolls():
     scroll_files = os.listdir(scroll_dir)
     # filter out any non-folder files
     scroll_files = [file for file in scroll_files if os.path.isdir(os.path.join(scroll_dir, file))]
-    # iterate through all the scroll files, use the list_scroll function to return the files in each folder,make a dictionary with the scroll name and the files in the folder
-    scroll_files = {scroll: list_scroll_safe(scroll) for scroll in scroll_files}
+    # iterate through all the scroll files, use the list_scroll function to return the files in each folder,make a dictionary with the scroll name and the files in the folder. use the list_scroll_safe function to return the dictionary but maintain it as a json object
+    scroll_files = [list_scroll_safe(scroll) for scroll in scroll_files]
     return {"scrolls": scroll_files}
 
 
@@ -47,6 +47,7 @@ async def list_scroll(scroll_name: str):
     scroll_dir = f"../scrolls/{scroll_name}"
     scroll_files = os.listdir(scroll_dir)
     scroll_files = [file for file in scroll_files if file.endswith(".abc")]
+    # reform the object so it would look like {"name": "scroll_name", "files": ["file1.abc", "file2.abc"]}
     return {"scroll": scroll_name, "files": scroll_files}
 
 def list_scroll_safe(scroll_name: str):
@@ -54,6 +55,8 @@ def list_scroll_safe(scroll_name: str):
     scroll_dir = f"../scrolls/{scroll_name}"
     scroll_files = os.listdir(scroll_dir)
     scroll_files = [file for file in scroll_files if file.endswith(".abc")]
+    # reform the object so it would look like {"name": "scroll_name", "files": ["file1.abc", "file2.abc"]}
+    scroll_files = {"name": scroll_name, "abc_scrolls": scroll_files}
     return scroll_files
 
 
