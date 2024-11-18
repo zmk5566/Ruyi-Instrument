@@ -33,6 +33,7 @@ padding: 20px; /* Adds some space inside the #score div around its content */
 border: 2px solid #000; /* Example border to visualize the "box" */
 margin: auto; /* Centers the #score div if it has a set width */
 width: 90%; /* Adjust based on your design needs */
+margin-top: 10px;
 }
 
 #score h3 {

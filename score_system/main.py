@@ -13,6 +13,9 @@ static_dir = "static"
 # This line can be adjusted or removed based on your preferences
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# mount another directory for the scrolls folder, which is located in ../scrolls
+app.mount("/scrolls", StaticFiles(directory="../scrolls"), name="scrolls")
+
 
 @app.middleware("http")
 async def serve_static_files(request: Request, call_next):

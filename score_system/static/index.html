@@ -25,11 +25,20 @@
         triggerSelection(selection_name);
     });
 
+    // add a listener to the choice-parts select element
+    document.getElementById('choice-parts').addEventListener('change', function(){
+        // get the value of the selected option
+        var selection_name = this.value;
+        // trigger the triggerSelection function
+        trigger_load_score(selection_name);
+    });
 
 
         //drawSVG();
         load_all_configs();
     };
+
+
      
 
     </script>
@@ -73,11 +82,10 @@
 
     <!-- Button container to group buttons in one line -->
     <div class="button-container">
-        <button onclick="drawSVG()">重绘</button>
         <button id="startButton">开始</button>
         <button id="stopButton">停止</button>
-        <button id="sendWebStartButton">START</button>
-        <button id="sendWebStopButton">STOP</button>
+        <button id="sendWebStartButton">齐始</button>
+        <button id="sendWebStopButton">齐停</button>
     </div>
     
     <div id="timePassed">Time Passed: 0 seconds</div>
@@ -85,6 +93,27 @@
 
 
 <script>
+
+function trigger_load_score(the_score_name){
+    var the_play_name = document.getElementById('choices').value;
+    var file_path = the_play_name + "/" + the_score_name;
+    console.log(file_path);
+    $.ajax({
+        url: '/scrolls/' + file_path,
+        type: 'GET',
+        success: function(response){
+            console.log(response);
+            abc = response;
+            drawSVG(abc);
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+
+
+
+}
 
 
 
@@ -154,6 +183,9 @@ function triggerSelection(selection_name){
                     option.innerHTML = part;
                     document.getElementById('choice-parts').appendChild(option);
                 });
+                // trigger the first one to be loaded
+                trigger_load_score(response.parts[0]);
+
             },
             error: function(error){
                 console.log(error);
@@ -164,17 +196,11 @@ function triggerSelection(selection_name){
 
 
 
-function drawSVG() {
+function drawSVG(abc_input) {
 
     const choice = document.getElementById('choices').value;
 
-    var abcNotation = "";
-    // Display the corresponding string
-    if (choice === "1") {
-        abcNotation = abc;
-    } else if (choice === "2") {
-        abcNotation = abc;
-    }
+    abcNotation = abc_input;
 
 
 
