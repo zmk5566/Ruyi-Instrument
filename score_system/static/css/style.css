@@ -73,3 +73,14 @@ padding: 5px; /* Adds some spacing inside the container */
 #left-score a {
     margin-right: 5px; /* Adjust as needed */
 }
+
+#audio{
+    width: 85%;
+    margin: auto;
+    display: block;
+    padding: 20px;
+}
+
+.highlight {
+    fill:blue;
+}

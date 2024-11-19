@@ -268,6 +268,7 @@ function draw_beam(note_list, x_shift, y_shift) {
 
     note_list.forEach((note, index) => {
         // Assuming draw_note provides the X position for each note
+        note.id = index;
         let temp_object = draw_note (note, x_shift, y_shift);
 
 
@@ -642,12 +643,12 @@ function draw_quarter_note (note, decoration_svg,currentX, y_shift){
     // the note is drawn at the coordinates (x_shift, y_shift)
                 // Drawing two notes as per example, hardcoded positions which can be made dynamic
     var svgContent = "";
-    svgContent += `<text x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
+    svgContent += `<text id="${note.startChar}" x="${currentX}" y="${y_shift}" class="small">${note.note}</text>`;
     
     
     // check does the note exist a beam, if not draw a line
     if (note.symbol === "start_beam"|| note.symbol === "end_beam"){
-//do nothing
+    //do nothing
     }else{
     svgContent += `<line x1="${currentX - 10}" y1="${y_shift + 10}" x2="${currentX + 10}" y2="${y_shift + 10}" stroke="black"/> stroke-width="1"`;
     }   
@@ -658,6 +659,12 @@ function draw_quarter_note (note, decoration_svg,currentX, y_shift){
     // Update the currentX position for the next note
     currentX += unit_shift;
     svgContent+= decoration_svg;
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
+
+    // wrap the svg content in a group element, give it an id
+    console.log(note.id);
+    //svgContent = newGroup;
 
     return {svgContent, currentX};
 }
@@ -676,6 +683,8 @@ function draw_half_note (note, decoration_svg,currentX, y_shift){
 
     //console.log(svgContent);
     svgContent+= decoration_svg;
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
 
     return {svgContent, currentX};
 }
@@ -689,6 +698,9 @@ function draw_dotted_half_note (note, decoration_svg,currentX, y_shift){
     }
     currentX += unit_shift*1.5;
     svgContent+= decoration_svg;
+
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
 
     return {svgContent, currentX};
 }
@@ -707,6 +719,11 @@ function draw_whole_note (note, decoration_svg,currentX, y_shift){
     currentX += unit_shift*4;
 
     svgContent+= decoration_svg;
+
+
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
+
 
     return {svgContent, currentX};
 }
@@ -732,6 +749,9 @@ function draw_dotted_whole_note (note, decoration_svg,currentX, y_shift){
     //console.log(decoration_svg)
 
 
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
+
     return {svgContent, currentX};
 }
 
@@ -748,6 +768,10 @@ function draw_double_whole_note (note,decoration_svg, currentX, y_shift){
     currentX += unit_shift*8;
 
     svgContent+= decoration_svg;
+
+
+    var temp_note_id = note.startChar;
+    svgContent = `<g id="note_`+temp_note_id+`">${svgContent}</g>`;
 
     return {svgContent, currentX};
 }
@@ -787,6 +811,7 @@ function draw_note (note, x_shift, y_shift){
     var y_shift = y_shift;
 
     var temp_svgContent = "";
+
 
     if (note.gracenotes){
         console.log ("gracenotes", note.gracenotes.length);
@@ -878,7 +903,7 @@ function draw_note (note, x_shift, y_shift){
         case 6:
             return draw_dotted_whole_note(note, temp_svgContent,x_shift, y_shift);
         default:
-            return draw_quarter_note(note, temp_svgContent,x_shift, y_shift);
+            return draw_quarter_note(note,temp_svgContent,x_shift, y_shift);
     }
 
 
@@ -1064,6 +1089,7 @@ function parseAbcNoteToMyNotation(abcNote, bar_number) {
         y_pos: -1,
         decorations: abcNote.decoration,
         gracenotes: abcNote.gracenotes,
+        startChar: abcNote.startChar,
         symbol: symbol
     };
 
@@ -1082,7 +1108,8 @@ var test_node = {
     "x_pos": -1,
     "y_pos": -1,
     "decorations": [],
-    "gracenotes": []
+    "gracenotes": [],
+    "startChar": 38,
 };
 
 
