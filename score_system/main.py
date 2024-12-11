@@ -3,6 +3,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
 import aiofiles.os
+from fastapi import WebSocket
+from typing import List
 
 app = FastAPI()
 
@@ -67,3 +69,33 @@ def list_scroll_safe(scroll_name: str):
 async def current_directory():
     # Example API route
     return {"message": "This is the /current/ endpoint."}
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/chat")
+async def websocket_chat(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.broadcast(f"Message text was: {data}")
+    except Exception as e:
+        print(e)
+    finally:
+        manager.disconnect(websocket)

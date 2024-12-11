@@ -18,9 +18,21 @@ var abc = "T: 月光下的凤尾竹\n" +
 
 
 
+
+function getWebSocketUrl() {
+    var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+    var host = window.location.hostname;
+    var port = window.location.port ? ':' + window.location.port : '';
+    var wsPath = "/ws/chat";
+    return protocolPrefix + '//' + host + port + wsPath;
+}
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // Connect to the WebSocket server
-    websocket = new WebSocket('ws://192.168.50.8:9000');
+    websocket = new WebSocket("ws://localhost:8000/ws/chat");
     
     // Event listener for when the connection is open
     websocket.onopen = function(event) {
