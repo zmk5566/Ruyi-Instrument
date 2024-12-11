@@ -28,6 +28,16 @@ function getWebSocketUrl() {
 }
 
 
+function createUserCircle(userName, userColor) {
+    const initial = userName.charAt(0).toUpperCase();
+    const circleHTML = `<div style="width:50px; height:50px; border-radius:50%; background-color:${userColor}; display:flex; justify-content:center; align-items:center; font-size:30px;">${initial}</div>`;
+    
+    // Append to the usersContainer
+    const usersContainer = document.getElementById("usersContainer");
+    const div = document.createElement("div");
+    div.innerHTML = circleHTML;
+    usersContainer.appendChild(div.firstChild);
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,15 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for when a message is received
     websocket.onmessage = function(event) {
         //console.log("Message from server:", event.data);
-
+        var data = JSON.parse(event.data);
         // if the message contains start, then start the animation
+        console.log(event);
         if (event.data === "start"){
             const startButton = document.getElementById('startButton');
             startButton.click(); 
         } else if (event.data === "stop"){
             const stopButton = document.getElementById('stopButton');
             stopButton.click();
+        }else if (data.userName && data.userColor) {
+            console.log("drawwwing circles");
+            createUserCircle(data.userName, data.userColor);
         }
+
+
     };
 
 

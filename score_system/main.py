@@ -3,8 +3,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
 import aiofiles.os
-from fastapi import WebSocket
+from fastapi import WebSocket,WebSocketDisconnect
 from typing import List
+import json
 
 app = FastAPI()
 
@@ -94,8 +95,14 @@ async def websocket_chat(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"Message text was: {data}")
+            json_data = json.loads(data)  # Assuming incoming data is JSON string
+            if "userName" in json_data and "userColor" in json_data:
+                # Broadcast user info to all connected clients
+                await manager.broadcast(json.dumps(json_data))
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
     except Exception as e:
         print(e)
     finally:
         manager.disconnect(websocket)
+
