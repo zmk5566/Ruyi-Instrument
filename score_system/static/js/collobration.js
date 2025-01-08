@@ -1,5 +1,73 @@
 var userName ;
 var userColor ;
+var websocket;
+
+let heartbeatInterval = null; // Define this at the top of your script
+
+var retried_times = 0;
+
+function getWebSocketUrl() {
+    var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+    var host = window.location.hostname;
+    var port = window.location.port ? ':' + window.location.port : '';
+    var wsPath = "/ws/chat";
+    return protocolPrefix + '//' + host + port + wsPath;
+}
+
+
+function createUserCircle(userName, userColor) {
+    const initial = userName.charAt(0).toUpperCase();
+    const circleHTML = `<div class='user_cycle' style="background-color:${userColor}; display:flex; justify-content:center; align-items:center;">${initial}</div>`;
+    
+    // Append to the usersContainer
+    const usersContainer = document.getElementById("usersContainer");
+    const div = document.createElement("div");
+    div.innerHTML = circleHTML;
+    usersContainer.appendChild(div.firstChild);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Connect to the WebSocket server
+    websocket = new WebSocket("ws://localhost:8000/ws/chat");
+    
+    // Event listener for when the connection is open
+    websocket.onopen = function(event) {
+        //console.log("Connected to the WebSocket server");
+        if (!heartbeatInterval) {
+            heartbeatInterval = setInterval(sendHeartbeat, 3000);
+        }
+    };
+
+    // Event listener for when a message is received
+    websocket.onmessage = function(event) {
+        //console.log("Message from server:", event.data);
+        var data = JSON.parse(event.data);
+        // if the message contains start, then start the animation
+        console.log(event);
+        if (event.data === "start"){
+            const startButton = document.getElementById('startButton');
+            startButton.click(); 
+        } else if (event.data === "stop"){
+            const stopButton = document.getElementById('stopButton');
+            stopButton.click();
+            // check whther type": "userList", in else
+        }
+        else if (data.type === "userList") {
+            const usersContainer = document.getElementById("usersContainer");
+            usersContainer.innerHTML = "";
+            data.data.forEach(user => {
+                createUserCircle(user.userName, user.userColor);
+            });
+        }
+
+
+    };
+
+
+});
+
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -26,8 +94,14 @@ function setUser() {
     displayUserCharacter(userName, userColor);
     console.log(JSON.stringify({userName: userName, userColor: userColor}));
 
+
     websocket.send(JSON.stringify({userName: userName, userColor: userColor}));
+
+
+
 }
+
+
 
 function displayUserCharacter(userName, userColor) {
     const initial = userName.charAt(0).toUpperCase();
@@ -69,4 +143,29 @@ function clearCookies() {
     setCookie("userName", "", -1);
     setCookie("userColor", "", -1);
     location.reload();
+}
+
+function sendHeartbeat() {
+    if (websocket.readyState === WebSocket.OPEN) {
+
+        if (!userName ) {
+            console.log("Username or userColor is not set");
+            return;
+        }else{
+            const heartbeatMsg = JSON.stringify({ userName: userName, userColor: userColor });
+            console.log("Sending heartbeat message", heartbeatMsg);
+            websocket.send(heartbeatMsg);
+        }
+
+    }else{
+        retried_times += 1;
+        console.log("Websocket is not open");
+        usersContainer.innerHTML = "";
+
+        // clear the user 
+    }
+    if (retried_times > 3) {
+        // reload the page
+        location.reload();
+    }
 }

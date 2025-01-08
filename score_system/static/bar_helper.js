@@ -5,7 +5,6 @@ var bpm =60;
 var x_shift = 20;
 var y_shift = 40;
 var total_duration = 0;
-var websocket;
 
 var abc = "T: 月光下的凤尾竹\n" +
 "M: 3/4\n" +
@@ -19,58 +18,9 @@ var abc = "T: 月光下的凤尾竹\n" +
 
 
 
-function getWebSocketUrl() {
-    var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-    var host = window.location.hostname;
-    var port = window.location.port ? ':' + window.location.port : '';
-    var wsPath = "/ws/chat";
-    return protocolPrefix + '//' + host + port + wsPath;
-}
 
 
-function createUserCircle(userName, userColor) {
-    const initial = userName.charAt(0).toUpperCase();
-    const circleHTML = `<div style="width:50px; height:50px; border-radius:50%; background-color:${userColor}; display:flex; justify-content:center; align-items:center; font-size:30px;">${initial}</div>`;
-    
-    // Append to the usersContainer
-    const usersContainer = document.getElementById("usersContainer");
-    const div = document.createElement("div");
-    div.innerHTML = circleHTML;
-    usersContainer.appendChild(div.firstChild);
-}
 
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Connect to the WebSocket server
-    websocket = new WebSocket("ws://localhost:8000/ws/chat");
-    
-    // Event listener for when the connection is open
-    websocket.onopen = function(event) {
-        //console.log("Connected to the WebSocket server");
-    };
-
-    // Event listener for when a message is received
-    websocket.onmessage = function(event) {
-        //console.log("Message from server:", event.data);
-        var data = JSON.parse(event.data);
-        // if the message contains start, then start the animation
-        console.log(event);
-        if (event.data === "start"){
-            const startButton = document.getElementById('startButton');
-            startButton.click(); 
-        } else if (event.data === "stop"){
-            const stopButton = document.getElementById('stopButton');
-            stopButton.click();
-        }else if (data.userName && data.userColor) {
-            console.log("drawwwing circles");
-            createUserCircle(data.userName, data.userColor);
-        }
-
-
-    };
-
-
-});
 
 
 function getGeneralInfo(abc){

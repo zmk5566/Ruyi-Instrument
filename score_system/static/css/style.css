@@ -118,3 +118,18 @@ padding: 5px; /* Adds some spacing inside the container */
     justify-content: center; /* Centers items horizontally */
   }
   
+#usersContainer{
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.user_cycle{
+    width:35px; 
+    height:35px;
+    border-radius:50%;
+    font-size: 20px;
+}

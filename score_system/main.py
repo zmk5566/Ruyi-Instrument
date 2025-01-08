@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
-import aiofiles.os
+import asyncio
 from fastapi import WebSocket,WebSocketDisconnect
 from typing import List
 import json
@@ -72,22 +72,55 @@ async def current_directory():
     return {"message": "This is the /current/ endpoint."}
 
 
+
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
+        self.active_connections = []
+        self.user_list = []  # To maintain a list of active users based on userName and userColor
+        self.last_heartbeat = {}  # Track the last heartbeat for each user
+    
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
-
+    
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
+    
+    def add_user(self, user_info):
+        if user_info not in self.user_list:
+            self.user_list.append(user_info)
+            self.last_heartbeat[user_info['userName']] = asyncio.get_event_loop().time()
+            
+    def remove_user(self, user_info):
+        if user_info in self.user_list:
+            self.user_list.remove(user_info)
+            del self.last_heartbeat[user_info['userName']]
+            
+    async def check_heartbeat(self):
+        while True:
+            current_time = asyncio.get_event_loop().time()
+            disconnected_users = []
+            for user, last_time in self.last_heartbeat.items():
+                if current_time - last_time > 3:  # 6 seconds to account for possible slight delays
+                    disconnected_users.append(user)
+            for user in disconnected_users:
+                user_info = next((u for u in self.user_list if u['userName'] == user), None)
+                if user_info:
+                    self.remove_user(user_info)
+                    await self.broadcast(json.dumps({"type": "userList", "data": self.user_list}))
+            await manager.broadcast(json.dumps({"type": "userList", "data": manager.user_list}))
+            await asyncio.sleep(2)  # Check every 5 seconds
 
 manager = ConnectionManager()
+
+@app.on_event("startup")
+async def startup_event():
+    # Start the heartbeat check as soon as the app starts
+    asyncio.create_task(manager.check_heartbeat())
 
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
@@ -95,14 +128,19 @@ async def websocket_chat(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            json_data = json.loads(data)  # Assuming incoming data is JSON string
+            json_data = json.loads(data)
             if "userName" in json_data and "userColor" in json_data:
-                # Broadcast user info to all connected clients
-                await manager.broadcast(json.dumps(json_data))
+                user_info = {"userName": json_data["userName"], "userColor": json_data["userColor"]}
+                if user_info not in manager.user_list:
+                    manager.add_user(user_info)
+                    await manager.broadcast(json.dumps({"type": "userList", "data": manager.user_list}))
+                manager.last_heartbeat[json_data["userName"]] = asyncio.get_event_loop().time()  # Update heartbeat on any message received
     except WebSocketDisconnect:
+        # On disconnect, remove user info handling is already covered by the heartbeat checker
         manager.disconnect(websocket)
     except Exception as e:
         print(e)
     finally:
         manager.disconnect(websocket)
+
 
