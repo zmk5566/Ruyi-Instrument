@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     userColor = getCookie("userColor");
 
     if (!userName || !userColor) {
-        document.getElementById("userInfoPopup").style.display = "block";
+        // remove the display none from the popup, but dont do block
+        document.getElementById("userInfoPopup").style.display = "flex";
     } else {
         displayUserCharacter(userName, userColor);
     }
@@ -30,9 +31,14 @@ function setUser() {
 
 function displayUserCharacter(userName, userColor) {
     const initial = userName.charAt(0).toUpperCase();
-    const userCharacterDiv = document.getElementById("userCharacter");
-    userCharacterDiv.style.display = "block";
-    userCharacterDiv.innerHTML = `<div style="width:50px; height:50px; border-radius:50%; background-color:${userColor}; display:flex; justify-content:center; align-items:center; font-size:30px;">${initial}</div>`;
+    const parentUserPanel = document.getElementById("user_pannel");
+
+    parentUserPanel.style.display = "flex";
+
+    const userCharacterDiv2 = document.getElementById("userCharacter");
+
+    userCharacterDiv2.innerHTML = `<div style="width:50px; height:50px; border-radius:50%; background-color:${userColor}; display:flex; justify-content:center; align-items:center; font-size:30px;">${initial}</div>`;
+
 }
 
 // Utility functions for cookies
@@ -55,4 +61,12 @@ function getCookie(name) {
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
     }
     return null;
+}
+
+// add a function to clear all the cookies
+
+function clearCookies() {
+    setCookie("userName", "", -1);
+    setCookie("userColor", "", -1);
+    location.reload();
 }

@@ -84,3 +84,37 @@ padding: 5px; /* Adds some spacing inside the container */
 .highlight {
     fill:blue;
 }
+
+#user_pannel {
+    display: flex;
+}
+
+#sign_out_button {
+    margin: 10px;
+    width: 50px;
+    height: 30px;
+}
+
+
+
+#user_pannel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#userCharacter > div {
+    border-radius: 50%;
+    background-color: #3c66aa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+
+#userInfoPopup {
+    justify-content: center; /* Centers items horizontally */
+  }
+  

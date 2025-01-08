@@ -48,7 +48,8 @@
 
 
 			self.onEvent = function(ev) {
-                console.log("onEvent");
+                console.log("onEvent");3
+
 				console.log(ev);
 				if (ev.measureStart && ev.left === null)
 					return; // this was the second part of a tie across a measure line. Just ignore it.
@@ -122,13 +123,28 @@
 <body>
 
 
-    <div id="userCharacter" style="display:none;"></div> <!-- Placeholder for the character -->
+    <div id = "user_pannel" style="display:none;" >
+        <div id="userCharacter" > </div>
+
+        <div id="user_control_wrapper">
+            <button id="sign_out_button" onclick="clearCookies()">登出</button>
+        </div>
+
+
+
+
+    </div>
+
+
+
+    </div> <!-- Placeholder for the character -->
+
 
     <!-- Popup form for new users -->
     <div id="userInfoPopup" style="display:none;">
-        <input type="text" id="userName" placeholder="Your Name">
+        <input type="text" id="userName" placeholder="输入名字">
         <input type="color" id="userColor">
-        <button onclick="setUser()">Confirm</button>
+        <button onclick="setUser()">确定</button>
     </div>
 
 
