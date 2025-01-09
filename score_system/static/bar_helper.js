@@ -116,12 +116,27 @@ function getAllVoices(abc,staff_index) {
 
 function startMS(){
 
-    websocket.send("start");
+    var temp_message = {"type":"command","data":"start"};
+    console.log("send start to server");
+    console.log(temp_message);
+    websocket.send(JSON.stringify(temp_message));
+
 }
+
 
 function stopMS(){
 
-    websocket.send("stop");
+    
+    var temp_message = {"type":"command","data":"stop"};
+    websocket.send(JSON.stringify(temp_message));
+
+}
+
+function pauseMS(){
+    
+    var temp_message = {"type":"command","data":"pause"};
+    websocket.send(JSON.stringify(temp_message));
+
 }
 
 
@@ -187,6 +202,7 @@ function draw_score(abc_notation,x_shift, y_shift){
         // Add event listener to the button
     document.getElementById('sendWebStartButton').addEventListener('click', startMS);
     document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
+    document.getElementById('sendWebPauseButton').addEventListener('click', pauseMS);
     
     var total_svgContent = `<svg width="740" height="500" xmlns="http://www.w3.org/2000/svg">
     <style>
@@ -1092,27 +1108,27 @@ var test_node = {
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
-    const startButton = document.getElementById('startButton');
-    let startTime;
-    let animationFrameId;
+    // const startButton = document.getElementById('startButton');
+    // let startTime;
+    // let animationFrameId;
 
-    startButton.addEventListener('click', () => {
-        // Ensure Tone.js is started
-        if (Tone.context.state !== 'running') {
-            Tone.start();
-        }
+    // startButton.addEventListener('click', () => {
+    //     // Ensure Tone.js is started
+    //     if (Tone.context.state !== 'running') {
+    //         Tone.start();
+    //     }
 
-        startTime = Tone.now(); // Capture the start time
-        requestAnimationFrame(animateLine); // Start the animation
-    });
+    //     startTime = Tone.now(); // Capture the start time
+    //     requestAnimationFrame(animateLine); // Start the animation
+    // });
 
-    // add the stop button logic 
-    const stopButton = document.getElementById('stopButton');
-    stopButton.addEventListener('click', () => {
-        cancelAnimationFrame(animationFrameId);
-        // Reset the hover box to the initial position
-        move_the_hover_box(x_shift, y_shift,-2);
-    });
+    // // add the stop button logic 
+    // const stopButton = document.getElementById('stopButton');
+    // stopButton.addEventListener('click', () => {
+    //     cancelAnimationFrame(animationFrameId);
+    //     // Reset the hover box to the initial position
+    //     move_the_hover_box(x_shift, y_shift,-2);
+    // });
 
     function animateLine() {
         const currentTime = Tone.now();

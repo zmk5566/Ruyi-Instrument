@@ -44,15 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
         //console.log("Message from server:", event.data);
         var data = JSON.parse(event.data);
         // if the message contains start, then start the animation
-        console.log(event);
-        if (event.data === "start"){
-            const startButton = document.getElementById('startButton');
-            startButton.click(); 
-        } else if (event.data === "stop"){
-            const stopButton = document.getElementById('stopButton');
-            stopButton.click();
-            // check whther type": "userList", in else
-        }
+        //console.log(event);
+        if (data.type === "command"){
+            if (data.data === "start") {
+                if (!synthControl.isStarted){
+                    synthControl.play();
+                }
+            } else if (data.data === "stop") {
+                synthControl.pause();
+                synthControl.finished();
+            } else if (data.data === "pause") {
+                    synthControl.pause();
+            }
+        } 
         else if (data.type === "userList") {
             const usersContainer = document.getElementById("usersContainer");
             usersContainer.innerHTML = "";

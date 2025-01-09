@@ -133,3 +133,10 @@ padding: 5px; /* Adds some spacing inside the container */
     border-radius:50%;
     font-size: 20px;
 }
+
+.button-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}

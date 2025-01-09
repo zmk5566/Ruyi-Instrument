@@ -129,6 +129,13 @@ async def websocket_chat(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             json_data = json.loads(data)
+            #print (json_data)
+            if "type" in json_data:
+                # broadcast the json data to all the active connections
+                print(json_data)
+                await manager.broadcast(json.dumps(json_data))
+                
+
             if "userName" in json_data and "userColor" in json_data:
                 user_info = {"userName": json_data["userName"], "userColor": json_data["userColor"]}
                 if user_info not in manager.user_list:
