@@ -77,7 +77,7 @@ padding: 5px; /* Adds some spacing inside the container */
 #audio{
     width: 85%;
     margin: auto;
-    display: block;
+    display: none;
     padding: 20px;
 }
 

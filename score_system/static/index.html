@@ -324,7 +324,7 @@ function drawSVG(abc_input) {
 
 
     //const svgOutput = parse_notes(abcNotation); // Assuming no shift is needed for this example
-    const svgOutput = draw_score(abcNotation,20,40);
+    const svgOutput = draw_score(abcNotation,20,60);
     var meta_data  = getGeneralInfo(abcNotation);
     document.getElementById('title').innerHTML = meta_data.title;
     document.getElementById('key').innerHTML = meta_data.key;
@@ -339,6 +339,9 @@ function drawSVG(abc_input) {
 }
 
 
+function notifier(){
+    console.log("notified");
+}
 
 
 
@@ -365,6 +368,7 @@ function play() {
           if (synthControl) {
 					synthControl.setTune(visualObj, false).then(function (response) {
 						console.log("Audio successfully loaded.")
+                        synthControl.runWhenReady(notifier,-1);
 						//seekControls.classList.remove("disabled");
 						//seekExplanation();
 					}).catch(function (error) {

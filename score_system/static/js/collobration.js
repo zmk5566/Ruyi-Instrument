@@ -49,12 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.data === "start") {
                 if (!synthControl.isStarted){
                     synthControl.play();
+                    //requestAnimationFrame(animateLine);
                 }
             } else if (data.data === "stop") {
                 synthControl.pause();
                 synthControl.finished();
+                synthControl.timer.currentTime = 0;
             } else if (data.data === "pause") {
                     synthControl.pause();
+                    move_the_hover_box(global_x_shift,global_y_shift,0);
             }
         } 
         else if (data.type === "userList") {
@@ -157,7 +160,7 @@ function sendHeartbeat() {
             return;
         }else{
             const heartbeatMsg = JSON.stringify({ userName: userName, userColor: userColor });
-            console.log("Sending heartbeat message", heartbeatMsg);
+            //console.log("Sending heartbeat message", heartbeatMsg);
             websocket.send(heartbeatMsg);
         }
 

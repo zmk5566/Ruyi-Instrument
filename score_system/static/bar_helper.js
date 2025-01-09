@@ -5,7 +5,9 @@ var bpm =60;
 var x_shift = 20;
 var y_shift = 40;
 var total_duration = 0;
-
+var startTime = null;
+var global_x_shift = 20;
+var global_y_shift = 40;
 var abc = "T: 月光下的凤尾竹\n" +
 "M: 3/4\n" +
 "L: 1/8\n" +
@@ -194,6 +196,8 @@ function draw_score(abc_notation,x_shift, y_shift){
     // draw all the connections
     // draw all the symbols
     //var note_list = parse_notes(abc_notation);
+    global_x_shift = x_shift;
+    global_y_shift = y_shift;
     var note_list = abcToNoteList(abc_notation);
 
     var bar_list = abcToBarList(abc_notation);
@@ -496,9 +500,9 @@ function draw_the_hover_box(x_shift, y_shift,current_time){
     // so we can calculate the position of the hover box
     var currentX = x_shift + current_time*unit_shift-unit_shift/4;
     ////console.log("currentX" + currentX);
-    var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+    var currentY = y_shift  + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
 
-    svgContent += `<rect id = "the_hover" x="${currentX}" y="${currentY}" width="${unit_shift/2}" height="${unit_shift}"  stroke="none" stroke-width="0"/>`;
+    svgContent += `<rect id = "the_hover" x="${currentX}" y="${currentY}" width="${unit_shift/4}" height="${unit_shift*1.5}"  stroke-width="1"/>`;
 
     return svgContent;
 
@@ -508,11 +512,12 @@ function draw_the_hover_box(x_shift, y_shift,current_time){
 function move_the_hover_box(x_shift, y_shift,current_time){
     
     var the_hover = document.getElementById("the_hover");
-    var currentX = x_shift + current_time*unit_shift-unit_shift/4;
-    var currentY = y_shift - unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+    var currentX = x_shift + current_time/synthControl.timer.millisecondsPerBeat*unit_shift+unit_shift/8;
+    var currentY = y_shift + unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
     currentX = currentX % (unit_shift*6*horizontal_bar_count);
     the_hover.setAttribute("x", currentX);
     the_hover.setAttribute("y", currentY);
+    //console.log("redraw the hover box",currentX, currentY);
 
     //draw_slur
 
@@ -1107,40 +1112,29 @@ var test_node = {
 };
 
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    // const startButton = document.getElementById('startButton');
-    // let startTime;
-    // let animationFrameId;
 
-    // startButton.addEventListener('click', () => {
-    //     // Ensure Tone.js is started
-    //     if (Tone.context.state !== 'running') {
-    //         Tone.start();
-    //     }
 
-    //     startTime = Tone.now(); // Capture the start time
-    //     requestAnimationFrame(animateLine); // Start the animation
-    // });
 
-    // // add the stop button logic 
-    // const stopButton = document.getElementById('stopButton');
-    // stopButton.addEventListener('click', () => {
-    //     cancelAnimationFrame(animationFrameId);
-    //     // Reset the hover box to the initial position
-    //     move_the_hover_box(x_shift, y_shift,-2);
-    // });
-
-    function animateLine() {
-        const currentTime = Tone.now();
-        const timeElapsed = currentTime - startTime; // Time elapsed since button was clicked
-        
-        move_the_hover_box(x_shift, y_shift,timeElapsed);
-
-        // Continue the animation if not reached the end
-        if (timeElapsed < total_duration) {
-            animationFrameId = requestAnimationFrame(animateLine);
+// Animation loop function
+function animateHoverBox(timestamp) {
+    // Example x_shift and y_shift values, adjust these as needed
+    let x_shift = 10; // Example: move 10 units on every call
+    let y_shift = 5;  // Example: move 5 units on every call
+    
+    // Call your function to move the hover box
+    if (synthControl){
+        if (synthControl.timer!=null){
+            move_the_hover_box(x_shift, y_shift, synthControl.timer.currentTime);
         }
     }
-});
+
+    // Request the next frame to continue the loop
+    requestAnimationFrame(animateHoverBox);
+}
+
+// Start the animation loop
+requestAnimationFrame(animateHoverBox);
+
+
 
 

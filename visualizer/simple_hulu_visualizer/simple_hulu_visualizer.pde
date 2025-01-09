@@ -7,6 +7,7 @@ int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
 String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB","B"};
 int pitchShift = -2;
+String identifier = "50.204";
 
 // start defining the situation
 
