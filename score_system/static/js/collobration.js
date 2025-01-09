@@ -1,6 +1,7 @@
 var userName ;
 var userColor ;
 var websocket;
+var current_pitch_value = 0;
 
 let heartbeatInterval = null; // Define this at the top of your script
 
@@ -66,6 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             data.data.forEach(user => {
                 createUserCircle(user.userName, user.userColor);
             });
+        }else if (data.type === "instrument") {
+            console.log("Instrument data", data);
+            current_pitch_value = data.data; 
+
         }
 
 
@@ -160,6 +165,7 @@ function sendHeartbeat() {
             return;
         }else{
             const heartbeatMsg = JSON.stringify({ userName: userName, userColor: userColor });
+            
             //console.log("Sending heartbeat message", heartbeatMsg);
             websocket.send(heartbeatMsg);
         }
@@ -175,4 +181,24 @@ function sendHeartbeat() {
         // reload the page
         location.reload();
     }
+}
+
+
+function midiNoteToNumericalNotation(midiNumber, shift = 0) {
+    // Define numerical notation with '1' corresponding to C, and so forth
+    const notes = ['1', '1#', '2', '2#', '3', '4', '4#', '5', '5#', '6', '6#', '7'];
+    
+    // Calculate the position in the octave, taking into account the shift
+    let noteIndex = (midiNumber + shift) % 12;
+    
+    // Ensure noteIndex is always positive
+    noteIndex = (noteIndex + 12) % 12; 
+
+    // Select the numerical note name from the notes array
+    let noteName = notes[noteIndex];
+    
+    // Calculate the octave of the note, adjusting for the shift
+    const octave = Math.floor((midiNumber + shift) / 12) - 1;
+
+    return `${noteName}`;
 }

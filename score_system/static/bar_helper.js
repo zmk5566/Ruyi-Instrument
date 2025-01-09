@@ -503,6 +503,8 @@ function draw_the_hover_box(x_shift, y_shift,current_time){
     var currentY = y_shift  + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
 
     svgContent += `<rect id = "the_hover" x="${currentX}" y="${currentY}" width="${unit_shift/4}" height="${unit_shift*1.5}"  stroke-width="1"/>`;
+    // add a show current_pitch_value text below 
+    svgContent += `<text id = "current_hover_text" x="${currentX}" y="${currentY}" class="small">"${current_pitch_value}"</text>`;
 
     return svgContent;
 
@@ -517,6 +519,12 @@ function move_the_hover_box(x_shift, y_shift,current_time){
     currentX = currentX % (unit_shift*6*horizontal_bar_count);
     the_hover.setAttribute("x", currentX);
     the_hover.setAttribute("y", currentY);
+
+    var current_hover_text = document.getElementById("current_hover_text");
+    current_hover_text.setAttribute("x", currentX+unit_shift/8);
+    current_hover_text.setAttribute("y", currentY+unit_shift*1.5);
+    current_hover_text.innerHTML = midiNoteToNumericalNotation(current_pitch_value,5);
+
     //console.log("redraw the hover box",currentX, currentY);
 
     //draw_slur

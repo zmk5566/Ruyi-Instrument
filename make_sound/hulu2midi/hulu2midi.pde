@@ -1,8 +1,9 @@
 //SinOsc sine;
- 
+import websockets.*;
 import themidibus.*; //Import the library
 import oscP5.*;
 import netP5.*;
+WebsocketClient wsc;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
 String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB","B"};
@@ -11,6 +12,7 @@ int pitch = 0;
 int velocity;
 int ground_adding = 40 ; 
 int the_randomness_limit = 128;
+String userNameID = "001";
 // start defining the situation
 
 OscP5 oscP5;
@@ -38,9 +40,8 @@ void setup() {
   MidiBus.list(); // List all available Midi devices on STDOUT. This will show each device's index and name.
 
   myBus = new MidiBus(new java.lang.Object(), -1,"VMidi 1"); // Create a new MidiBus with no input device and the default Java Sound Synthesizer as the output device.
+  wsc= new WebsocketClient(this, "ws://127.0.0.1:8000/ws/chat");
 
-  
-  
   /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
    * an ip address and a port number. myRemoteLocation is used as parameter in
    * oscP5.send() when sending osc packets to another computer, device, 
@@ -238,6 +239,7 @@ void updateGate(int input_breath,int pitch_value){
       myMessage2.add(1);
       oscP5.send(myMessage2, myRemoteLocation);    
       myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
+      sendMidiNote(pitch_value);
       pitch = pitch_value;
       println("send midi out", input_breath);
     }
@@ -253,9 +255,10 @@ void updateGate(int input_breath,int pitch_value){
 
        // update the pitch again 
        myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
-      println("send midi out", pitch_value);
+       sendMidiNote(pitch_value);
+       println("send midi out", pitch_value);
 
-        pitch = pitch_value;
+       pitch = pitch_value;
         
     }
     }
@@ -348,4 +351,15 @@ void keyPressed() {
       pitchShift--; // 减少pitch shift的值
     }
   }
+}
+
+void sendMidiNote(int pitch){
+  JSONObject json;
+
+  json = new JSONObject();
+
+  json.setString("type","instrument");
+  json.setString("userNameID", userNameID);
+  json.setInt("data", pitch);
+  
 }

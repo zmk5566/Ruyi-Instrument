@@ -140,3 +140,13 @@ padding: 5px; /* Adds some spacing inside the container */
     align-items: center;
     margin: 10px;
 }
+
+#the_hover{
+    fill: black;
+    opacity: 0.25;
+}
+
+#current_hover_text{
+    font-size: 15px;
+    font-weight: bold;
+}
