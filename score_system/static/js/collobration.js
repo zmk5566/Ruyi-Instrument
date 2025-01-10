@@ -78,14 +78,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }else if (data.type === "instrument") {
             console.log("Instrument data", data);
-            current_pitch_value = data.data; 
-            // create a json, containing the pitch value and the time
-            var temp_json_value = {pitch: current_pitch_value, time: synthControl.timer.currentTime};
-            recorded_past_play_list.push(temp_json_value);
 
-            // maybe added a render function here
-            create_past_note_svg(current_pitch_value,global_x_shift,global_y_shift,synthControl.timer.currentTime);
+            // check if the existing userName contains data.userNameID
+            if (userName.includes(data.userNameID)) {
+                // if the userNameID is the same as the current userName, then set the instrument
+        
+                current_pitch_value = data.data; 
+                // create a json, containing the pitch value and the time
+                var temp_json_value = {pitch: current_pitch_value, time: synthControl.timer.currentTime};
+                recorded_past_play_list.push(temp_json_value);
 
+                // maybe added a render function here
+                create_past_note_svg(current_pitch_value,global_x_shift,global_y_shift,synthControl.timer.currentTime);
+
+        }
 
         }
 
