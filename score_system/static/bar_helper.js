@@ -208,7 +208,7 @@ function draw_score(abc_notation,x_shift, y_shift){
     document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
     document.getElementById('sendWebPauseButton').addEventListener('click', pauseMS);
     
-    var total_svgContent = `<svg width="740" height="500" xmlns="http://www.w3.org/2000/svg">
+    var total_svgContent = `<svg width="740" height="500" id="the_svg_score" xmlns="http://www.w3.org/2000/svg">
     <style>
     text {
       font-size: 20px;
@@ -240,6 +240,9 @@ function draw_score(abc_notation,x_shift, y_shift){
 
 
     total_svgContent += draw_the_hover_box(x_shift, y_shift,-2);
+
+    // append an empty place holder for the past notes, with the element id past_notes
+    total_svgContent += `<g id="past_notes"></g>`;
 
 
     //console.log("finished drawing the bar");
@@ -523,12 +526,29 @@ function move_the_hover_box(x_shift, y_shift,current_time){
     var current_hover_text = document.getElementById("current_hover_text");
     current_hover_text.setAttribute("x", currentX+unit_shift/8);
     current_hover_text.setAttribute("y", currentY+unit_shift*1.5);
-    current_hover_text.innerHTML = midiNoteToNumericalNotation(current_pitch_value,5);
+    current_hover_text.innerHTML = midiNoteToNumericalNotation(current_pitch_value,-2);
 
     //console.log("redraw the hover box",currentX, currentY);
 
     //draw_slur
+}
 
+function create_past_note_svg(single_past_note,x_shift, y_shift,current_time){
+    // create a svg for a hover text   
+
+    var currentX = x_shift + current_time/synthControl.timer.millisecondsPerBeat*unit_shift+unit_shift/8;
+    var currentY = y_shift + unit_shift/2 + Math.floor(currentX/(unit_shift*6*horizontal_bar_count) )*vertical_unit_shift;
+    currentX = currentX % (unit_shift*6*horizontal_bar_count);
+
+    // create a element which is a text, with the class named running_text 
+    var svgContent = "";
+    svgContent += `<text x="${currentX-unit_shift/8}" y="${currentY}" fill="${userColor}" class="running_text">${midiNoteToNumericalNotation(single_past_note,-2)}</text>`;
+
+    // get the_svg_score
+    var the_svg_score = document.getElementById("past_notes");
+    // append the svgContent to the_svg_score
+    the_svg_score.innerHTML += svgContent;
+    return svgContent;
 
 }
 

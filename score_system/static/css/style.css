@@ -150,3 +150,8 @@ padding: 5px; /* Adds some spacing inside the container */
     font-size: 15px;
     font-weight: bold;
 }
+
+.running_text{
+    font-size: 15px;
+    font-weight: bold;
+}
