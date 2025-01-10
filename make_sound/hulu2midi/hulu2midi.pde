@@ -7,11 +7,12 @@ WebsocketClient wsc;
 int[] sensor_value = {0,0,0,0,0,0,0,0};
 JSONArray json;
 String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB","B"};
-int pitchShift = -2;
+int pitchShift = -5;
 int pitch = 0;
 int velocity;
-int ground_adding = 40 ; 
+int ground_adding = 20 ; 
 int the_randomness_limit = 128;
+int previousValue = -1;
 String userNameID = "001";
 // start defining the situation
 
@@ -239,7 +240,10 @@ void updateGate(int input_breath,int pitch_value){
       myMessage2.add(1);
       oscP5.send(myMessage2, myRemoteLocation);    
       myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
-      sendMidiNote(pitch_value);
+      if (pitch_value != previousValue){
+              sendMidiNote(pitch_value);
+              previousValue = pitch_value;
+      }
       pitch = pitch_value;
       println("send midi out", input_breath);
     }
@@ -255,7 +259,10 @@ void updateGate(int input_breath,int pitch_value){
 
        // update the pitch again 
        myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
-       sendMidiNote(pitch_value);
+      if (pitch_value != previousValue){
+              sendMidiNote(pitch_value);
+              previousValue = pitch_value;
+      }
        println("send midi out", pitch_value);
 
        pitch = pitch_value;
@@ -361,5 +368,6 @@ void sendMidiNote(int pitch){
   json.setString("type","instrument");
   json.setString("userNameID", userNameID);
   json.setInt("data", pitch);
+  wsc.sendMessage(json.toString());
   
 }
