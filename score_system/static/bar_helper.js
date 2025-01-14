@@ -122,7 +122,6 @@ function startMS(){
     console.log("send start to server");
     console.log(temp_message);
     websocket.send(JSON.stringify(temp_message));
-
 }
 
 
@@ -204,7 +203,7 @@ function draw_score(abc_notation,x_shift, y_shift){
     //console.log(bar_list);
 
         // Add event listener to the button
-    document.getElementById('sendWebStartButton').addEventListener('click', startMS);
+    document.getElementById('sendWebStartButton').addEventListener('click', metronome_start);
     document.getElementById('sendWebStopButton').addEventListener('click', stopMS);
     document.getElementById('sendWebPauseButton').addEventListener('click', pauseMS);
     

@@ -9,6 +9,81 @@ var retried_times = 0;
 
 var recorded_past_play_list = [];
 
+
+var metronome; 
+
+
+
+class Metronome {
+    constructor(the_interval_value = 340, onCountdownComplete = null) {
+        this.countdownValue = 3;
+        this.interval = the_interval_value;
+        this.onCountdownComplete = onCountdownComplete; // Callback when countdown completes
+        this.isTicking = false; // Flag to control the ticking
+    }
+
+    set_interval(value) {
+        this.interval = value;
+    }
+
+    start() {
+        this.interval =synthControl.timer.millisecondsPerBeat*2;
+        this.countdownValue = 4; // Reset the countdown value
+        if (!this.isTicking) {
+            this.isTicking = true;
+            this.nextTickTime = performance.now();
+            this.tick(); // Start the ticking process
+        }
+    }
+
+    stop() {
+        this.isTicking = false; // Stop the ticking
+    }
+
+    tick() {
+        if (!this.isTicking) return; // Exit if stopped
+
+        const now = performance.now();
+        const delay = this.nextTickTime - now;
+
+        if (delay <= 0) {
+            if (this.countdownValue > 0) {
+                this.playSound(); // Play sound only if countdown value is greater than 1
+            }
+
+            console.log(this.countdownValue); // Display countdown
+            
+            if (this.countdownValue === 0) {
+                // When countdown hits 0, stop the metronome and execute the callback if any
+                this.stop();
+                if (this.onCountdownComplete) {
+                    this.onCountdownComplete();
+                }
+            } else {
+                this.countdownValue--;
+                this.nextTickTime += this.interval;
+            }
+        }
+
+        if (this.isTicking) {
+            setTimeout(() => this.tick(), Math.max(0, this.nextTickTime - performance.now()));
+        }
+    }
+
+    playSound() {
+        // Example: Playing a sound using Web Audio API for simplicity
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(440, ctx.currentTime); // value in hertz
+        oscillator.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.1); // Play sound for 100ms
+    }
+}
+
+
+
 function getWebSocketUrl() {
     var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
     var host = window.location.hostname;
@@ -21,8 +96,12 @@ function clear_all_past_notes() {
     var svg = document.getElementById("past_notes");
     svg.innerHTML = "";
     recorded_past_play_list = [];
+}
 
-
+function change_speed(speed) {
+    // post the ws message to change the speed
+    console.log("Change speed to ", speed);
+    websocket.send(JSON.stringify({type: "command", data:"speed",value: speed}));
 }
 
 function createUserCircle(userName, userColor) {
@@ -68,6 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.data === "pause") {
                     synthControl.pause();
                     move_the_hover_box(global_x_shift,global_y_shift,0);
+            } else if (data.data === "speed") {
+                console.log("received speed change", data.value);
+                var speed_change =data.value;
+                synthControl.setWarp(speed_change);
+                // get the speed slider with the id speedSlider
+                var speedSlider = document.getElementById("speedSlider");
+                speedSlider.value = speed_change;
+
             }
         } 
         else if (data.type === "userList") {
@@ -90,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // maybe added a render function here
                 create_past_note_svg(current_pitch_value,global_x_shift,global_y_shift,synthControl.timer.currentTime);
-
         }
 
         }
@@ -227,4 +313,8 @@ function midiNoteToNumericalNotation(midiNumber, shift = 0) {
     }else{
         return `${noteName}`;
     }
+}
+
+function metronome_start(){
+    metronome.start();
 }

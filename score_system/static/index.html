@@ -191,6 +191,9 @@
         <button id="clearHistoryButton" onclick="clear_all_past_notes()"  >清空</button>
 
     </div>
+    <div>
+        <input type="range" id="speedSlider" min="50" max="150" step="25" value="100" oninput="change_speed(this.value)">
+    </div>
 </div>
 
 <div>
@@ -342,6 +345,14 @@ function drawSVG(abc_input) {
 
 function notifier(){
     console.log("notified");
+
+    console.log("play",synthControl.timer.millisecondsPerBeat);
+
+    metronome = new Metronome(synthControl.timer.millisecondsPerBeat*2, () => {
+        console.log('Countdown complete! Stopped.');
+        startMS();
+        // Perform any additional actions here when the countdown completes and the metronome stops.
+    });
 }
 
 
@@ -383,6 +394,10 @@ function play() {
       } else {
         document.querySelector(".error").innerHTML = "<div class='audio-error'>Audio is not supported in this browser.</div>";
       }
+
+
+
+
     }
 
 
