@@ -6,4 +6,5 @@ M:3/4
 L:1/8
 K:G
 Q:1/4=88
+%%MIDI transpose -2
 (CA,) (A,C) C2|(CD) (DE) E2|(ED) (DC) (CA,)|({A,}C4 DC)|({C}A,6|A,6)u|CC (DE) E2|(EC) (DE) E2|(GC) (DE) E2|(EA,) (CD) D2u|({D}E4 A,2)|CC (DE) E2|(EC) (DE) E2|(GE) (GA) A2|G2 (CE) (PDC)|({A,}C6|C6)|]

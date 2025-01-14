@@ -39,7 +39,7 @@ function createUserCircle(userName, userColor) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Connect to the WebSocket server
-    websocket = new WebSocket("ws://localhost:8000/ws/chat");
+    websocket = new WebSocket(getWebSocketUrl());
     
     // Event listener for when the connection is open
     websocket.onopen = function(event) {
@@ -222,5 +222,9 @@ function midiNoteToNumericalNotation(midiNumber, shift = 0) {
     // Calculate the octave of the note, adjusting for the shift
     const octave = Math.floor((midiNumber + shift) / 12) - 1;
 
-    return `${noteName}`;
+    if (current_pitch_value==0){
+        return ``;
+    }else{
+        return `${noteName}`;
+    }
 }

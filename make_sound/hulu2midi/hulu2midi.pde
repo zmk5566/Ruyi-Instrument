@@ -14,6 +14,7 @@ int ground_adding = 20 ;
 int the_randomness_limit = 128;
 int previousValue = -1;
 String userNameID = "001";
+String uid_identifier = "50.206";
 // start defining the situation
 
 OscP5 oscP5;
@@ -134,7 +135,7 @@ void oscEvent(OscMessage theOscMessage) {
   /* print the address pattern and the typetag of the received OscMessage */
   NetAddress senderAddress = theOscMessage.netAddress();
   String ipAddress = senderAddress.address();
-  if (ipAddress.contains("50.205")){
+  if (ipAddress.contains(uid_identifier)){
      //println("### received an osc message."); 
    
   try{
