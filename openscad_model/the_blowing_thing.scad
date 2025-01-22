@@ -50,7 +50,7 @@ module hulu(c_x_input,c_y_input) {
 }
 
 c_y = [0, 0, 35, 40, 50];
-c_x = [0, -48, 5, -9.02, -8] ;
+c_x = [0, -47.8, 5, -9.02, -8] ;
 
 
 difference(){
