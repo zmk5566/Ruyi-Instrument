@@ -1,4 +1,4 @@
-$fn=300;
+$fn=150;
 
 // Binomial coefficient (n choose k)
 function choose(n, k) = factorial(n) / (factorial(k) * factorial(n - k));
@@ -50,18 +50,18 @@ module hulu(c_x_input,c_y_input) {
 }
 
 c_y = [0, 0, 35, 40, 50];
-c_x = [0, -39, 5, -9.02, -8] ;
+c_x = [0, -48, 5, -9.02, -8] ;
 
 
 difference(){
 translate([0,0,-5])hulu(c_x,c_y);
-cylinder(h=500,r1=3.1, r2=2.8,center=true);
+cylinder(h=500,r1=4.2, r2=2,center=true);
 translate([0,0,-50])cube([100,100,100],center=true);
 }
 
-difference(){
-translate([0,0,-5])cylinder(h=15,r=4.1,center = true);
-translate([0,0,-8])cylinder(h=50,r=3,center = true);
+translate([0,0,0])difference(){
+translate([0,0,-5])cylinder(h=15,r1=4.4,r2=5,center = true);
+translate([0,0,-3])cylinder(h=50,r=3.1,center = true);
 
 }
 
