@@ -16,17 +16,17 @@ difference(){
 difference(){
     
     union(){
-        hollow_cylinder(outer_diameter = 8.6, inner_diameter = 6, height = 20);
+        hollow_cylinder(outer_diameter = 5.3, inner_diameter = 3.8, height = 20);
      difference() {
-        translate([-5,-5,-5])cube(10,10,10);
+        translate([-5,-5,-5])cube([10,10,10]);
 }
 }
-       translate([0,0,-4])cylinder(h = 18, r = 3, $fn = 100);
-       translate([0,0,-8])cylinder(h = 3 + 4, r = 6 / 2, $fn = 100); 
+       translate([0,0,-4])cylinder(h = 18, r = 1.9, $fn = 100);
+       translate([0,0,-8])cylinder(h = 3 + 4, r = 3.8 / 2, $fn = 100); 
        translate([5,0,0])rotate([0,150,0])translate([0,0,-4])cylinder(h = 5 + 2, r = 1.8 / 2,$fn = 100);
 }
 
-translate([5,0,0])rotate([0,150,0])translate([0,0,-4])hollow_cylinder(outer_diameter = 2.8, inner_diameter = 1.8, height = 15);
+translate([5,0,0])rotate([0,150,0])translate([0,0,-4])hollow_cylinder(outer_diameter = 2.8, inner_diameter = 1.8, height = 18);
 }
         translate([-4,-4,-4])cube(8,8,8);
 }
