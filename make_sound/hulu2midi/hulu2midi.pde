@@ -10,7 +10,7 @@ String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB
 int pitchShift = 2;
 int pitch = 0;
 int velocity;
-int ground_adding = 150 ; 
+int ground_adding = 230 ; 
 int the_randomness_limit = 128;
 int previousValue = -1;
 String userNameID = "001";
@@ -29,6 +29,9 @@ int p_breath = 0;
 int p_random = 0;
 
 int empty_state_counter = 0;
+
+int empty_threshold = 0;
+
 boolean isTriggered = false;
 
 void setup() {
@@ -108,7 +111,7 @@ void updatePitch(int pitch_value, int breath){
 
 
 void sendNoteOff(int pitch_value, int breath){
-  OscMessage myMessage = new OscMessage("/Hulusi/Basic_Parameters/midiPitch");
+  OscMessage myMessage = new OscMessage("/Hulusi/Basic_Parameters/Pitch");
   myMessage.add(pitch_value);
 
   /* send the message */
@@ -175,7 +178,7 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
         }
         
 
-        if (sensor_value[i]<=5){
+        if (sensor_value[i]<=empty_threshold){
           empty_state_counter =empty_state_counter+1;
           // do nothing 
         }else{
@@ -201,7 +204,7 @@ void update_the_sensor(int[] sensor_value,OscMessage theOscMessage){
     
     int inperfection = int(constrain(map(randomness,0,the_randomness_limit,0,255),0,255));
     
-    println("randomness and mapped cc: ",randomness,inperfection);
+    //println("randomness and mapped cc: ",randomness,inperfection);
     updateMidiCC(int(temp_value),inperfection);
     
   
@@ -251,12 +254,11 @@ void updateGate(int input_breath,int pitch_value){
     
   }else{
     
-    if (empty_state_counter<=5){
+    if (empty_state_counter<=empty_threshold){
       // note off the previous note first
        if (pitch_value!=pitch){
        myBus.sendNoteOff(0, pitch, 0); // Send a Midi noteOn
        
-       println("send midi Off", pitch);
 
        // update the pitch again 
        myBus.sendNoteOn(0, pitch_value, input_breath/2); // Send a Midi noteOn
@@ -271,7 +273,7 @@ void updateGate(int input_breath,int pitch_value){
     }
     }
     
-    if (empty_state_counter>5 && pitch!=0){
+    if (empty_state_counter>empty_threshold && pitch!=0){
          println("initial pitch", pitch, pitch_value);
 
         isTriggered = false;
@@ -280,6 +282,7 @@ void updateGate(int input_breath,int pitch_value){
         oscP5.send(myMessage2, myRemoteLocation);
         
         myBus.sendNoteOff(0, pitch, 0); // Send a Midi nodeOff
+        previousValue =-1;
         pitch = 0;
         println("send note off", pitch, pitch_value);
     

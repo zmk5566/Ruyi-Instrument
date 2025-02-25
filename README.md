@@ -16,4 +16,5 @@ then do
 
 TODO
 
-[] Fix the re-triggering
+[x] Fix the re-triggering
+[] The release retrigger functionality 
