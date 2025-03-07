@@ -16,7 +16,7 @@ difference(){
 difference(){
     
     union(){
-        hollow_cylinder(outer_diameter = 5.3, inner_diameter = 3.8, height = 20);
+        hollow_cylinder(outer_diameter = 5.5, inner_diameter = 3.8, height = 20);
      difference() {
         translate([-5,-5,-5])cube([10,10,10]);
 }
@@ -26,7 +26,7 @@ difference(){
        translate([5,0,0])rotate([0,150,0])translate([0,0,-4])cylinder(h = 5 + 2, r = 1.8 / 2,$fn = 100);
 }
 
-translate([5,0,0])rotate([0,150,0])translate([0,0,-4])hollow_cylinder(outer_diameter = 2.8, inner_diameter = 1.8, height = 18);
+translate([5,0,0])rotate([0,150,0])translate([0,0,-4])hollow_cylinder(outer_diameter = 2.8, inner_diameter = 1.8, height = 15);
 }
         translate([-4,-4,-4])cube(8,8,8);
 }

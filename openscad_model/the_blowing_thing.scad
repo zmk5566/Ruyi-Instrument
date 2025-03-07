@@ -60,7 +60,7 @@ translate([0,0,-50])cube([100,100,100],center=true);
 }
 
 translate([0,0,0])difference(){
-translate([0,0,-5])cylinder(h=15,r1=2.5,r2=2.9,center = true);
+translate([0,0,-5])cylinder(h=15,r1=2.7,r2=3.2,center = true);
 translate([0,0,-3])cylinder(h=50,r=1.85,center = true);
 
 }
