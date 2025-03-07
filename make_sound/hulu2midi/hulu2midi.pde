@@ -10,7 +10,7 @@ String[] pitchNames = { "C", "bD", "D", "bE", "E", "F", "bG", "G", "bA","A", "bB
 int pitchShift = 2;
 int pitch = 0;
 int velocity;
-int ground_adding = 230 ; 
+int ground_adding = 240; 
 int the_randomness_limit = 128;
 int previousValue = -1;
 String userNameID = "001";
